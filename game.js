@@ -1350,6 +1350,10 @@ Modes.incubator = {
         grid.appendChild(pod);
       });
     }
+    function placedCount(buddyId) {
+      // Don't count the active slot — it's about to be replaced
+      return pods.filter((p, i) => p && p.id === buddyId && i !== activeSlot).length;
+    }
     function showPicker() {
       const picker = $("incPickerGrid");
       picker.innerHTML = "";
@@ -1358,14 +1362,24 @@ Modes.incubator = {
         picker.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--dim)">No buddies yet. Open a pack first!</div>`;
       }
       owned.forEach(b => {
+        const own = ownedCount(b.id);
+        const placed = placedCount(b.id);
+        const available = own - placed;
         const card = document.createElement("div");
-        card.className = "inc-picker-buddy";
-        card.innerHTML = `<div class="ip-emoji">${b.emoji}</div><div class="ip-name">${b.name}</div><div style="font-size:10px;color:var(--accent)">+${rates[b.rarity]}/s</div>`;
-        card.onclick = () => {
-          pods[activeSlot] = b;
-          $("incPicker").classList.remove("show");
-          renderPods();
-        };
+        card.className = "inc-picker-buddy" + (available <= 0 ? " ip-disabled" : "");
+        card.innerHTML = `
+          <div class="ip-emoji">${b.emoji}</div>
+          <div class="ip-name">${b.name}</div>
+          <div style="font-size:10px;color:var(--accent)">+${rates[b.rarity]}/s</div>
+          <div style="font-size:9px;color:${available > 0 ? 'var(--accent2)' : 'var(--red)'}">${available}/${own} free</div>
+        `;
+        if (available > 0) {
+          card.onclick = () => {
+            pods[activeSlot] = b;
+            $("incPicker").classList.remove("show");
+            renderPods();
+          };
+        }
         picker.appendChild(card);
       });
       $("incPicker").classList.add("show");
