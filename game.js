@@ -389,7 +389,7 @@ function $(id) { return document.getElementById(id); }
 // Render an emoji as a polished Twemoji-style SVG (looks way better than system emoji).
 // Falls back to native emoji text if the CDN fails.
 function buddyImg(emoji, cls = "") {
-  const url = `https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=twitter`;
+  const url = `https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=apple`;
   const safe = emoji.replace(/'/g, "");
   return `<img class="b-img ${cls}" src="${url}" alt="${safe}" loading="lazy" onerror="this.outerHTML='<span class=\\'b-fallback\\'>${safe}</span>'">`;
 }
