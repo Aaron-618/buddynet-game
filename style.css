@@ -736,6 +736,17 @@ body {
   opacity: 0.3; cursor: not-allowed;
   background: transparent;
 }
+.bulk-btn-max {
+  background: linear-gradient(45deg, var(--accent), var(--pink));
+  color: #1a1a1a;
+  border: none;
+  font-size: 12px;
+  padding: 6px 14px;
+}
+.bulk-btn-max:hover:not(:disabled) {
+  background: linear-gradient(45deg, var(--pink), var(--accent));
+  color: #1a1a1a;
+}
 
 .bulk-result-card {
   max-width: 540px; width: 90%;

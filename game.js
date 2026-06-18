@@ -459,6 +459,8 @@ function renderShop() {
       const can = cur >= total;
       return `<button class="bulk-btn" data-qty="${n}" ${can ? "" : "disabled"} title="${total} ${symbol}">×${n}</button>`;
     }).join("");
+    const maxQty = Math.floor(cur / p.price);
+    const maxButton = `<button class="bulk-btn bulk-btn-max" data-qty="${maxQty}" ${maxQty > 0 ? "" : "disabled"} title="${maxQty * p.price} ${symbol}">MAX ×${maxQty}</button>`;
 
     const card = document.createElement("div");
     card.className = "pack-card" + (locked ? " locked" : "") + (hasToken ? " has-token" : "");
@@ -469,7 +471,7 @@ function renderShop() {
       <div class="pack-desc">${p.desc || ""}</div>
       <div class="pack-price">${hasToken ? "FREE" : symbol + " " + p.price}</div>
       <div class="pack-rarities">${rarityTags}</div>
-      <div class="bulk-row">${bulkButtons}</div>
+      <div class="bulk-row">${bulkButtons}${maxButton}</div>
     `;
 
     // Card click (excluding bulk buttons) = single open
