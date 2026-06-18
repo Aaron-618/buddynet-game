@@ -385,6 +385,19 @@ function save() {
 
 // ---------- UTILS ----------
 function $(id) { return document.getElementById(id); }
+
+// Render an emoji as a polished Twemoji-style SVG (looks way better than system emoji).
+// Falls back to native emoji text if the CDN fails.
+function buddyImg(emoji, cls = "") {
+  const url = `https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=twitter`;
+  const safe = emoji.replace(/'/g, "");
+  return `<img class="b-img ${cls}" src="${url}" alt="${safe}" loading="lazy" onerror="this.outerHTML='<span class=\\'b-fallback\\'>${safe}</span>'">`;
+}
+
+// Wrap a buddy image in a rarity-themed frame (the "card art" look)
+function buddyFrame(emoji, rarity, sizeClass = "") {
+  return `<div class="b-frame border-${rarity} ${sizeClass}">${buddyImg(emoji)}</div>`;
+}
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   $(id).classList.add("active");
@@ -546,7 +559,7 @@ function showBulkResult(pack, qty, cost, results, newCount, rarityTally) {
     card.innerHTML = `
       ${isNew ? `<div class="bb-new">NEW</div>` : ""}
       ${count > 1 ? `<div class="bb-count">x${count}</div>` : ""}
-      <div class="bb-emoji">${buddy.emoji}</div>
+      <div class="bb-emoji">${buddyFrame(buddy.emoji, buddy.rarity)}</div>
       <div class="bb-name">${buddy.name}</div>
     `;
     grid.appendChild(card);
@@ -605,7 +618,7 @@ function openPack(pack) {
     reveal.classList.add("show");
     $("revealRarity").textContent = RARITIES[buddy.rarity].name.toUpperCase();
     $("revealRarity").className = "reveal-rarity r-" + buddy.rarity;
-    $("revealBuddy").textContent = buddy.emoji;
+    $("revealBuddy").innerHTML = buddyFrame(buddy.emoji, buddy.rarity, "b-frame-xl");
     $("revealName").textContent = buddy.name;
     $("revealStatus").textContent = isNew ? "✨ NEW! ✨" : `Owned x${State.owned[buddy.id]}`;
     $("revealStatus").style.color = isNew ? "var(--accent2)" : "var(--dim)";
@@ -643,7 +656,7 @@ function renderDex() {
       card.className = "buddy-card border-" + b.rarity + (seen ? "" : " locked");
       card.innerHTML = `
         ${count > 0 ? `<div class="buddy-count">x${count}</div>` : ""}
-        <div class="buddy-emoji">${seen ? b.emoji : "❓"}</div>
+        <div class="buddy-emoji">${seen ? buddyFrame(b.emoji, b.rarity) : '<div class="b-frame locked-frame">❓</div>'}</div>
         <div class="buddy-name">${seen ? b.name : "???"}</div>
         <div class="buddy-rarity r-${b.rarity}">${RARITIES[b.rarity].name}</div>
       `;
@@ -691,7 +704,7 @@ let currentDetailBuddy = null;
 function showBuddyDetail(b) {
   currentDetailBuddy = b;
   const count = ownedCount(b.id);
-  $("detailBuddy").textContent = b.emoji;
+  $("detailBuddy").innerHTML = buddyFrame(b.emoji, b.rarity, "b-frame-lg");
   $("detailRarity").textContent = RARITIES[b.rarity].name.toUpperCase();
   $("detailRarity").className = "detail-rarity r-" + b.rarity;
   $("detailName").textContent = b.name;
@@ -1344,7 +1357,7 @@ Modes.incubator = {
         const pod = document.createElement("div");
         pod.className = "inc-pod" + (b ? " filled" : "");
         if (b) {
-          pod.innerHTML = `<div class="inc-pod-icon">${b.emoji}</div><div>${b.name}</div><div class="inc-pod-rate">+${rates[b.rarity]}/s</div>`;
+          pod.innerHTML = `<div class="inc-pod-icon">${buddyFrame(b.emoji, b.rarity)}</div><div>${b.name}</div><div class="inc-pod-rate">+${rates[b.rarity]}/s</div>`;
         } else {
           pod.innerHTML = `<div class="inc-pod-icon">➕</div><div class="dim">Empty</div>`;
         }
@@ -1370,7 +1383,7 @@ Modes.incubator = {
         const card = document.createElement("div");
         card.className = "inc-picker-buddy" + (available <= 0 ? " ip-disabled" : "");
         card.innerHTML = `
-          <div class="ip-emoji">${b.emoji}</div>
+          <div class="ip-emoji">${buddyFrame(b.emoji, b.rarity)}</div>
           <div class="ip-name">${b.name}</div>
           <div style="font-size:10px;color:var(--accent)">+${rates[b.rarity]}/s</div>
           <div style="font-size:9px;color:${available > 0 ? 'var(--accent2)' : 'var(--red)'}">${available}/${own} free</div>
