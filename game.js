@@ -41,7 +41,7 @@ const PACKS = [
         { name: "The Dragon", emoji: "🐉" }
       ]},
       { rarity: "mystical", weight: 0.02, buddies: [
-        { name: "The Phoenix Overlord", emoji: "🦅", sell: 10000 }
+        { name: "The Phoenix Overlord", emoji: "🐦‍🔥", sell: 10000 }
       ]}
     ]
   },
@@ -95,7 +95,7 @@ const PACKS = [
       ]},
       { rarity: "epic", weight: 16.5, buddies: [
         { name: "Black Hole", emoji: "🕳️" },
-        { name: "Alien Queen", emoji: "👑" }
+        { name: "Alien Queen", emoji: "👾" }
       ]},
       { rarity: "legendary", weight: 0.45, buddies: [
         { name: "The Astronaut King", emoji: "👨‍🚀" }
@@ -129,7 +129,7 @@ const PACKS = [
         { name: "Wolverine", emoji: "🐺" }
       ]},
       { rarity: "legendary", weight: 0.46, buddies: [
-        { name: "The Forest Spirit", emoji: "🌳" }
+        { name: "The Forest Spirit", emoji: "🧚" }
       ]},
       { rarity: "chroma", weight: 0.02, buddies: [
         { name: "Rainbow Campfire", emoji: "🔥", effect: "rainbow" }
@@ -148,11 +148,11 @@ const PACKS = [
         { name: "Triceratops", emoji: "🦏" },
         { name: "Stegosaurus", emoji: "🦕" },
         { name: "Raptor", emoji: "🦖" },
-        { name: "Pterodactyl", emoji: "🪶" }
+        { name: "Pterodactyl", emoji: "🦅" }
       ]},
       { rarity: "rare", weight: 30, buddies: [
         { name: "Brachiosaurus", emoji: "🦕" },
-        { name: "Ankylosaurus", emoji: "🐊" }
+        { name: "Ankylosaurus", emoji: "🦔" }
       ]},
       { rarity: "epic", weight: 15.7, buddies: [
         { name: "Saber-Toothed Tiger", emoji: "🐅" },
@@ -206,7 +206,7 @@ const PACKS = [
     desc: "Fantasy pack full of royal knights, wizards, and mythical beasts.",
     drops: [
       { rarity: "uncommon", weight: 53, buddies: [
-        { name: "Squire", emoji: "🧑‍🌾" },
+        { name: "Squire", emoji: "🤺" },
         { name: "Castle Guard", emoji: "🛡️" },
         { name: "Archer", emoji: "🏹" },
         { name: "Goblin", emoji: "👺" }
@@ -218,7 +218,7 @@ const PACKS = [
       ]},
       { rarity: "epic", weight: 16.5, buddies: [
         { name: "Griffin", emoji: "🦅" },
-        { name: "Phoenix", emoji: "🔥" }
+        { name: "Phoenix", emoji: "🐦‍🔥" }
       ]},
       { rarity: "legendary", weight: 0.46, buddies: [
         { name: "The King", emoji: "👑" }
