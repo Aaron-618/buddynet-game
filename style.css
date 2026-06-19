@@ -829,6 +829,23 @@ body {
   100% { filter: hue-rotate(360deg) drop-shadow(0 3px 5px rgba(0,0,0,0.4)) saturate(2); }
 }
 
+/* Golden — turn the buddy gold/yellow with a subtle shimmer */
+.b-frame.fx-golden .b-img,
+.b-frame.fx-golden .b-fallback {
+  filter:
+    sepia(1)
+    saturate(6)
+    hue-rotate(-15deg)
+    brightness(1.1)
+    drop-shadow(0 0 8px rgba(255,193,7,0.8))
+    drop-shadow(0 3px 5px rgba(0,0,0,0.4));
+  animation: goldShimmer 2.5s ease-in-out infinite;
+}
+@keyframes goldShimmer {
+  0%, 100% { filter: sepia(1) saturate(6) hue-rotate(-15deg) brightness(1.1) drop-shadow(0 0 8px rgba(255,193,7,0.8))  drop-shadow(0 3px 5px rgba(0,0,0,0.4)); }
+  50%      { filter: sepia(1) saturate(8) hue-rotate(-10deg) brightness(1.25) drop-shadow(0 0 16px rgba(255,217,61,1)) drop-shadow(0 3px 5px rgba(0,0,0,0.4)); }
+}
+
 /* ---------- PACK TOKEN BANNER ---------- */
 .token-banner {
   background: linear-gradient(45deg, var(--green), var(--accent2));

@@ -162,7 +162,7 @@ const PACKS = [
         { name: "Tyrannosaurus Rex", emoji: "🦖" }
       ]},
       { rarity: "chroma", weight: 0.02, buddies: [
-        { name: "Golden Fossil", emoji: "🦴" }
+        { name: "Golden Fossil", emoji: "🦴", effect: "golden" }
       ]},
       { rarity: "mystical", weight: 0.02, buddies: [
         { name: "Meteor Apocalypse", emoji: "☄️", sell: 10000 }
