@@ -391,6 +391,262 @@ const PACKS = [
         { name: "The Ghost Emperor", emoji: "👻", sell: 10000 }
       ]}
     ]
+  },
+
+  {
+    id: "mythic", name: "Mythic Beasts Pack", emoji: "🐲", price: 40, currency: "coins",
+    desc: "Creatures from ancient mythologies and forgotten legends.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Faun", emoji: "🐐" },
+        { name: "Centaur", emoji: "🏹" },
+        { name: "Pixie", emoji: "🧚" },
+        { name: "Imp", emoji: "😈" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Hydra", emoji: "🐲" },
+        { name: "Minotaur", emoji: "🐂" },
+        { name: "Unicorn", emoji: "🦄" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Cerberus", emoji: "🐕" },
+        { name: "Medusa", emoji: "🐍" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Titan", emoji: "🗿" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Pegasus Knight", emoji: "🦄", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "World Serpent", emoji: "🐉", sell: 10000 }
+      ]}
+    ]
+  },
+
+  {
+    id: "demon", name: "Demon Realm Pack", emoji: "😈", price: 60, currency: "coins",
+    desc: "Tear open the gates of the underworld.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Demon Imp", emoji: "👿" },
+        { name: "Shade", emoji: "👤" },
+        { name: "Hellhound", emoji: "🐺" },
+        { name: "Cursed Skull", emoji: "💀" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Succubus", emoji: "🦇" },
+        { name: "Warlock", emoji: "🧙" },
+        { name: "Demon Knight", emoji: "⚔️" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Hell Lord", emoji: "👹" },
+        { name: "Soul Reaper", emoji: "💀" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Devil", emoji: "😈" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Inferno Wing", emoji: "🔥", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "Lord of the Abyss", emoji: "🕳️", sell: 10000 }
+      ]}
+    ]
+  },
+
+  {
+    id: "frozen", name: "Frozen Tundra Pack", emoji: "❄️", price: 40, currency: "coins",
+    desc: "Creatures of eternal ice and bone-cracking cold.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Snowball", emoji: "⚪" },
+        { name: "Ice Shard", emoji: "🧊" },
+        { name: "Frost Fairy", emoji: "✨" },
+        { name: "Polar Pup", emoji: "🐻‍❄️" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Penguin Knight", emoji: "🐧" },
+        { name: "Snow Wolf", emoji: "🐺" },
+        { name: "Ice Bear", emoji: "🐻‍❄️" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Frost Giant", emoji: "🥶" },
+        { name: "Snow Leopard", emoji: "🐆" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Yeti", emoji: "🦍" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Aurora Wisp", emoji: "🌌", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "The Ice Empress", emoji: "👸", sell: 10000 }
+      ]}
+    ]
+  },
+
+  {
+    id: "inferno", name: "Inferno Pack", emoji: "🌋", price: 50, currency: "coins",
+    desc: "Molten beasts born from a thousand volcanoes.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Ember", emoji: "🔥" },
+        { name: "Magma Drop", emoji: "🟠" },
+        { name: "Cinder", emoji: "✨" },
+        { name: "Spark Imp", emoji: "💢" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Fire Spirit", emoji: "🔥" },
+        { name: "Lava Slug", emoji: "🐌" },
+        { name: "Phoenix Egg", emoji: "🥚" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Magma Beast", emoji: "🦏" },
+        { name: "Volcano Lord", emoji: "🌋" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Fire God", emoji: "☄️" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Solar Flare", emoji: "☀️", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "Heart of the Volcano", emoji: "❤️‍🔥", sell: 10000 }
+      ]}
+    ]
+  },
+
+  {
+    id: "crystal", name: "Crystal Cavern Pack", emoji: "💎", price: 40, currency: "coins",
+    desc: "Glittering wonders deep beneath the earth.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Ruby Chip", emoji: "♦️" },
+        { name: "Sapphire Chip", emoji: "🔷" },
+        { name: "Emerald Chip", emoji: "💚" },
+        { name: "Topaz", emoji: "🟡" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Amethyst", emoji: "💜" },
+        { name: "Quartz Cluster", emoji: "🤍" },
+        { name: "Onyx", emoji: "🖤" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Crystal Heart", emoji: "💖" },
+        { name: "Gem Beast", emoji: "💎" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Diamond Lord", emoji: "💎" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Prism Geode", emoji: "🔮", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "Crystal Overlord", emoji: "💠", sell: 10000 }
+      ]}
+    ]
+  },
+
+  {
+    id: "storm", name: "Storm Lords Pack", emoji: "🌪️", price: 40, currency: "coins",
+    desc: "Sky-shattering forces of wind and lightning.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Drizzle", emoji: "☁️" },
+        { name: "Mist", emoji: "🌫️" },
+        { name: "Hail Stone", emoji: "🧊" },
+        { name: "Wind Spirit", emoji: "🌬️" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Thunder", emoji: "🌩️" },
+        { name: "Lightning Bolt", emoji: "⚡" },
+        { name: "Hurricane", emoji: "🌀" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Tornado Beast", emoji: "🌪️" },
+        { name: "Storm Caller", emoji: "⛈️" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Storm King", emoji: "👑" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Rainbow Tempest", emoji: "🌈", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "Eye of the Storm", emoji: "👁️", sell: 10000 }
+      ]}
+    ]
+  },
+
+  {
+    id: "dragon", name: "Dragon Den Pack", emoji: "🐉", price: 75, currency: "coins",
+    desc: "The most coveted pack — dragons of every breed.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Wyrmling", emoji: "🐍" },
+        { name: "Drake", emoji: "🦎" },
+        { name: "Hatchling", emoji: "🥚" },
+        { name: "Wyvern", emoji: "🦅" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Frost Wyrm", emoji: "🐲" },
+        { name: "Sea Serpent", emoji: "🐉" },
+        { name: "Wind Drake", emoji: "🌬️" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Ancient Wyrm", emoji: "🐉" },
+        { name: "Dragon Knight", emoji: "🛡️" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Dragon King", emoji: "🐲" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Rainbow Dragon", emoji: "🐉", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "The Eternal Dragon", emoji: "🐲", sell: 10000 }
+      ]}
+    ]
+  },
+
+  {
+    id: "necro", name: "Necropolis Pack", emoji: "🦴", price: 50, currency: "coins",
+    desc: "The restless dead rise from forgotten tombs.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Skull", emoji: "💀" },
+        { name: "Bone", emoji: "🦴" },
+        { name: "Spirit Wisp", emoji: "👻" },
+        { name: "Tombstone", emoji: "🪦" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Zombie", emoji: "🧟" },
+        { name: "Mummy", emoji: "🥷" },
+        { name: "Skeleton Warrior", emoji: "⚔️" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Lich King", emoji: "🧙" },
+        { name: "Bone Dragon", emoji: "🐉" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Reaper", emoji: "💀" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Phantom Glow", emoji: "👻", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "Lord of the Dead", emoji: "🦴", sell: 10000 }
+      ]}
+    ]
   }
 ];
 
@@ -436,8 +692,9 @@ const State = {
   gems: parseInt(localStorage.getItem("bn_gems") || "0"),
   packsOpened: parseInt(localStorage.getItem("bn_packs") || "0"),
   owned: JSON.parse(localStorage.getItem("bn_owned") || "{}"),
-  tokens: JSON.parse(localStorage.getItem("bn_tokens") || "{}"),  // packId -> count
+  tokens: JSON.parse(localStorage.getItem("bn_tokens") || "{}"),
   lastSpin: parseInt(localStorage.getItem("bn_lastSpin") || "0"),
+  endgameUnlocked: localStorage.getItem("bn_endgame") === "true",
   filterRarity: "all",
   filterPack: "all"
 };
@@ -449,6 +706,7 @@ function save() {
   localStorage.setItem("bn_owned", JSON.stringify(State.owned));
   localStorage.setItem("bn_tokens", JSON.stringify(State.tokens));
   localStorage.setItem("bn_lastSpin", State.lastSpin);
+  localStorage.setItem("bn_endgame", State.endgameUnlocked ? "true" : "false");
 }
 
 // ---------- UTILS ----------
@@ -515,9 +773,36 @@ function baseBuddies() {
 function baseCollectedCount() {
   return baseBuddies().filter(b => ownedCount(b.id) > 0).length;
 }
+function checkEndgameUnlock() {
+  if (State.endgameUnlocked) return true;
+  if (baseBuddies().every(b => ownedCount(b.id) > 0)) {
+    State.endgameUnlocked = true;
+    save();
+    return true;
+  }
+  return false;
+}
 function isPackUnlocked(pack) {
   if (!pack.requiresAll) return true;
-  return baseBuddies().every(b => ownedCount(b.id) > 0);
+  return State.endgameUnlocked;
+}
+
+function celebrateEndgameUnlock() {
+  const overlay = document.createElement("div");
+  overlay.className = "endgame-celebrate";
+  overlay.innerHTML = `
+    <div class="ec-card">
+      <div class="ec-emoji">🎉</div>
+      <h1>ENDGAME UNLOCKED!</h1>
+      <p>You collected all base buddies. 10 new endgame packs are now available in the Market.</p>
+      <button class="big-btn" id="ecOk">Open Endgame Market</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById("ecOk").onclick = () => {
+    overlay.remove();
+    show("shop");
+  };
 }
 
 // ---------- HUD ----------
@@ -556,19 +841,21 @@ function renderShop() {
 
   // Show unlock progress / celebration if any endgame packs exist
   const endgamePacks = PACKS.filter(p => p.requiresAll);
+  const unlocked = State.endgameUnlocked;
   if (endgamePacks.length > 0) {
     const total = baseBuddies().length;
     const collected = baseCollectedCount();
-    const unlocked = isPackUnlocked(endgamePacks[0]);
     const banner = document.createElement("div");
     banner.className = "endgame-banner" + (unlocked ? " unlocked" : "");
     banner.innerHTML = unlocked
-      ? `🎉 <strong>Endgame packs unlocked!</strong> You collected all ${total} base buddies.`
+      ? `🏆 <strong>ENDGAME MARKET</strong> — base packs are sealed. 10 endgame packs available.`
       : `🔒 Collect all base buddies to unlock endgame packs — <strong>${collected}/${total}</strong> collected`;
     grid.appendChild(banner);
   }
 
-  PACKS.forEach(p => {
+  // Once endgame is unlocked, hide base packs entirely
+  const visiblePacks = unlocked ? PACKS.filter(p => p.requiresAll) : PACKS;
+  visiblePacks.forEach(p => {
     const hasToken = (State.tokens[p.id] || 0) > 0;
     const cur = p.currency === "gems" ? State.gems : State.coins;
     const affordable = cur >= p.price;
@@ -648,10 +935,13 @@ function bulkOpenPack(pack, qty) {
     rarityTally[buddy.rarity] = (rarityTally[buddy.rarity] || 0) + 1;
   }
 
+  const wasUnlocked = State.endgameUnlocked;
+  checkEndgameUnlock();
   save();
   updateWallet();
   renderShop();
   renderDex();
+  if (!wasUnlocked && State.endgameUnlocked) celebrateEndgameUnlock();
   showBulkResult(pack, qty, totalCost, results, newCount, rarityTally);
 }
 
@@ -722,10 +1012,13 @@ function openPack(pack) {
   const buddy = pickFromPack(pack);
   const isNew = !discovered(buddy.id);
   State.owned[buddy.id] = (State.owned[buddy.id] || 0) + 1;
+  const wasUnlocked = State.endgameUnlocked;
+  checkEndgameUnlock();
   save();
   updateWallet();
   renderShop();
   renderDex();
+  if (!wasUnlocked && State.endgameUnlocked) celebrateEndgameUnlock();
 
   // Animation
   const overlay = $("packOpen");
