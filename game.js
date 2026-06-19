@@ -388,15 +388,27 @@ function $(id) { return document.getElementById(id); }
 
 // Render an emoji as a polished Twemoji-style SVG (looks way better than system emoji).
 // Falls back to native emoji text if the CDN fails.
-function buddyImg(emoji, cls = "") {
-  const url = `https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=apple`;
+// Different emoji styles per rarity tier — rarer buddies look visually distinct
+const RARITY_EMOJI_STYLE = {
+  common:    "microsoft",
+  uncommon:  "microsoft",
+  rare:      "google",
+  epic:      "google",
+  legendary: "samsung",
+  chroma:    "samsung",
+  mystical:  "samsung"
+};
+
+function buddyImg(emoji, cls = "", rarity = "") {
+  const style = RARITY_EMOJI_STYLE[rarity] || "microsoft";
+  const url = `https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=${style}`;
   const safe = emoji.replace(/'/g, "");
   return `<img class="b-img ${cls}" src="${url}" alt="${safe}" loading="lazy" onerror="this.outerHTML='<span class=\\'b-fallback\\'>${safe}</span>'">`;
 }
 
 // Wrap a buddy image in a rarity-themed frame (the "card art" look)
 function buddyFrame(emoji, rarity, sizeClass = "") {
-  return `<div class="b-frame border-${rarity} ${sizeClass}">${buddyImg(emoji)}</div>`;
+  return `<div class="b-frame border-${rarity} ${sizeClass}">${buddyImg(emoji, "", rarity)}</div>`;
 }
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
