@@ -400,7 +400,11 @@ const RARITY_EMOJI_STYLE = {
   mystical:  "samsung"
 };
 
-function buddyImg(emoji, cls = "", rarity = "") {
+function buddyImg(emoji, cls = "", rarity = "", buddyId = "") {
+  // Prefer hand-drawn custom SVG art when available
+  if (buddyId && typeof CUSTOM_SVG !== "undefined" && CUSTOM_SVG[buddyId]) {
+    return `<div class="b-img b-custom ${cls}">${CUSTOM_SVG[buddyId]}</div>`;
+  }
   const style = RARITY_EMOJI_STYLE[rarity] || "microsoft";
   const url = `https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=${style}`;
   const safe = emoji.replace(/'/g, "");
@@ -408,9 +412,9 @@ function buddyImg(emoji, cls = "", rarity = "") {
 }
 
 // Wrap a buddy image in a rarity-themed frame (the "card art" look)
-function buddyFrame(emoji, rarity, sizeClass = "", effect = "") {
+function buddyFrame(emoji, rarity, sizeClass = "", effect = "", buddyId = "") {
   const fx = effect ? `fx-${effect}` : "";
-  return `<div class="b-frame border-${rarity} ${sizeClass} ${fx}">${buddyImg(emoji, "", rarity)}</div>`;
+  return `<div class="b-frame border-${rarity} ${sizeClass} ${fx}">${buddyImg(emoji, "", rarity, buddyId)}</div>`;
 }
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -573,7 +577,7 @@ function showBulkResult(pack, qty, cost, results, newCount, rarityTally) {
     card.innerHTML = `
       ${isNew ? `<div class="bb-new">NEW</div>` : ""}
       ${count > 1 ? `<div class="bb-count">x${count}</div>` : ""}
-      <div class="bb-emoji">${buddyFrame(buddy.emoji, buddy.rarity, "", buddy.effect)}</div>
+      <div class="bb-emoji">${buddyFrame(buddy.emoji, buddy.rarity, "", buddy.effect, buddy.id)}</div>
       <div class="bb-name">${buddy.name}</div>
     `;
     grid.appendChild(card);
@@ -632,7 +636,7 @@ function openPack(pack) {
     reveal.classList.add("show");
     $("revealRarity").textContent = RARITIES[buddy.rarity].name.toUpperCase();
     $("revealRarity").className = "reveal-rarity r-" + buddy.rarity;
-    $("revealBuddy").innerHTML = buddyFrame(buddy.emoji, buddy.rarity, "b-frame-xl", buddy.effect);
+    $("revealBuddy").innerHTML = buddyFrame(buddy.emoji, buddy.rarity, "b-frame-xl", buddy.effect, buddy.id);
     $("revealName").textContent = buddy.name;
     $("revealStatus").textContent = isNew ? "✨ NEW! ✨" : `Owned x${State.owned[buddy.id]}`;
     $("revealStatus").style.color = isNew ? "var(--accent2)" : "var(--dim)";
@@ -670,7 +674,7 @@ function renderDex() {
       card.className = "buddy-card border-" + b.rarity + (seen ? "" : " locked");
       card.innerHTML = `
         ${count > 0 ? `<div class="buddy-count">x${count}</div>` : ""}
-        <div class="buddy-emoji">${seen ? buddyFrame(b.emoji, b.rarity, "", b.effect) : '<div class="b-frame locked-frame">❓</div>'}</div>
+        <div class="buddy-emoji">${seen ? buddyFrame(b.emoji, b.rarity, "", b.effect, b.id) : '<div class="b-frame locked-frame">❓</div>'}</div>
         <div class="buddy-name">${seen ? b.name : "???"}</div>
         <div class="buddy-rarity r-${b.rarity}">${RARITIES[b.rarity].name}</div>
       `;
@@ -718,7 +722,7 @@ let currentDetailBuddy = null;
 function showBuddyDetail(b) {
   currentDetailBuddy = b;
   const count = ownedCount(b.id);
-  $("detailBuddy").innerHTML = buddyFrame(b.emoji, b.rarity, "b-frame-lg", b.effect);
+  $("detailBuddy").innerHTML = buddyFrame(b.emoji, b.rarity, "b-frame-lg", b.effect, b.id);
   $("detailRarity").textContent = RARITIES[b.rarity].name.toUpperCase();
   $("detailRarity").className = "detail-rarity r-" + b.rarity;
   $("detailName").textContent = b.name;
@@ -1372,7 +1376,7 @@ Modes.incubator = {
         const pod = document.createElement("div");
         pod.className = "inc-pod" + (b ? " filled" : "");
         if (b) {
-          pod.innerHTML = `<div class="inc-pod-icon">${buddyFrame(b.emoji, b.rarity, "", b.effect)}</div><div>${b.name}</div><div class="inc-pod-rate">+${rates[b.rarity]}/s</div>`;
+          pod.innerHTML = `<div class="inc-pod-icon">${buddyFrame(b.emoji, b.rarity, "", b.effect, b.id)}</div><div>${b.name}</div><div class="inc-pod-rate">+${rates[b.rarity]}/s</div>`;
         } else {
           pod.innerHTML = `<div class="inc-pod-icon">➕</div><div class="dim">Empty</div>`;
         }
@@ -1398,7 +1402,7 @@ Modes.incubator = {
         const card = document.createElement("div");
         card.className = "inc-picker-buddy" + (available <= 0 ? " ip-disabled" : "");
         card.innerHTML = `
-          <div class="ip-emoji">${buddyFrame(b.emoji, b.rarity, "", b.effect)}</div>
+          <div class="ip-emoji">${buddyFrame(b.emoji, b.rarity, "", b.effect, b.id)}</div>
           <div class="ip-name">${b.name}</div>
           <div style="font-size:10px;color:var(--accent)">+${rates[b.rarity]}/s</div>
           <div style="font-size:9px;color:${available > 0 ? 'var(--accent2)' : 'var(--red)'}">${available}/${own} free</div>
