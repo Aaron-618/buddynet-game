@@ -1041,6 +1041,7 @@ function gameTimer(secs, onEnd) {
 function endGame({ win, title, coins, stats }) {
   if (GameRunner.timer) { clearInterval(GameRunner.timer); GameRunner.timer = null; }
   GameRunner.onTick = null;
+  coins = Math.round(coins);
   State.coins += coins;
   save();
   updateWallet();
@@ -1656,7 +1657,7 @@ Modes.siege = {
         if (enemy.dead) return;
         enemy.dead = true; e.classList.add("dying");
         kills++;
-        const earn = 4 * mult;
+        const earn = Math.round(4 * mult);
         GameRunner.coins += earn;
         GameRunner.score = kills;
         floatText("+" + earn, "#ffd93d");
