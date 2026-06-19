@@ -255,7 +255,7 @@ const PACKS = [
         { name: "The Gummy King", emoji: "🐻" }
       ]},
       { rarity: "chroma", weight: 0.04, buddies: [
-        { name: "Rainbow Jawbreaker", emoji: "🍡" }
+        { name: "Rainbow Jawbreaker", emoji: "🌈" }
       ]},
       { rarity: "mystical", weight: 0.02, buddies: [
         { name: "Candy Castle", emoji: "🏰", sell: 10000 }
