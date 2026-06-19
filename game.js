@@ -324,6 +324,73 @@ const PACKS = [
         { name: "The Hall of Famer", emoji: "🏅", sell: 10000 }
       ]}
     ]
+  },
+
+  // ===========================================================
+  // ENDGAME PACKS — unlock after collecting all base buddies
+  // ===========================================================
+  {
+    id: "nebula", name: "Nebula Pack", emoji: "🌌", price: 35, currency: "coins",
+    desc: "Cosmic forces beyond the galactic frontier.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Stardust", emoji: "✨" },
+        { name: "Cosmic Dust", emoji: "💫" },
+        { name: "Quasar", emoji: "🌠" },
+        { name: "Pulsar", emoji: "🌟" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Wormhole", emoji: "🌀" },
+        { name: "Quantum Bit", emoji: "⚛️" },
+        { name: "Antimatter", emoji: "☢️" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Singularity", emoji: "🕳️" },
+        { name: "Cosmic Web", emoji: "🕸️" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Multiverse", emoji: "♾️" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Aurora Streak", emoji: "🌈", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "The Big Bang", emoji: "💥", sell: 10000 }
+      ]}
+    ]
+  },
+
+  {
+    id: "shadow", name: "Shadow Clan Pack", emoji: "🥷", price: 35, currency: "coins",
+    desc: "Stealth assassins emerging from the shadows.",
+    requiresAll: true,
+    drops: [
+      { rarity: "uncommon", weight: 50, buddies: [
+        { name: "Ninja Recruit", emoji: "🥷" },
+        { name: "Shuriken", emoji: "🗡️" },
+        { name: "Smoke Bomb", emoji: "💨" },
+        { name: "Tanto Blade", emoji: "🔪" }
+      ]},
+      { rarity: "rare", weight: 33, buddies: [
+        { name: "Kunoichi", emoji: "🦊" },
+        { name: "Shadow Walker", emoji: "👤" },
+        { name: "Hidden Spy", emoji: "🕵️" }
+      ]},
+      { rarity: "epic", weight: 16.3, buddies: [
+        { name: "Master Ninja", emoji: "🥋" },
+        { name: "Shadow Beast", emoji: "🐅" }
+      ]},
+      { rarity: "legendary", weight: 0.5, buddies: [
+        { name: "The Shadow Lord", emoji: "👹" }
+      ]},
+      { rarity: "chroma", weight: 0.1, buddies: [
+        { name: "Phantom Strike", emoji: "⚡", effect: "rainbow" }
+      ]},
+      { rarity: "mystical", weight: 0.1, buddies: [
+        { name: "The Ghost Emperor", emoji: "👻", sell: 10000 }
+      ]}
+    ]
   }
 ];
 
@@ -438,6 +505,21 @@ function floatText(text, color, x, y) {
 function discovered(id) { return State.owned[id] !== undefined; }
 function ownedCount(id) { return State.owned[id] || 0; }
 
+// Unlock check for endgame packs (requiresAll: true)
+function baseBuddies() {
+  return BUDDIES.filter(b => {
+    const p = PACKS.find(pk => pk.id === b.packId);
+    return p && !p.requiresAll;
+  });
+}
+function baseCollectedCount() {
+  return baseBuddies().filter(b => ownedCount(b.id) > 0).length;
+}
+function isPackUnlocked(pack) {
+  if (!pack.requiresAll) return true;
+  return baseBuddies().every(b => ownedCount(b.id) > 0);
+}
+
 // ---------- HUD ----------
 function updateWallet() {
   $("walletCoins").textContent = State.coins.toLocaleString();
@@ -471,11 +553,27 @@ function renderShop() {
 
   const grid = $("packGrid");
   grid.innerHTML = "";
+
+  // Show unlock progress / celebration if any endgame packs exist
+  const endgamePacks = PACKS.filter(p => p.requiresAll);
+  if (endgamePacks.length > 0) {
+    const total = baseBuddies().length;
+    const collected = baseCollectedCount();
+    const unlocked = isPackUnlocked(endgamePacks[0]);
+    const banner = document.createElement("div");
+    banner.className = "endgame-banner" + (unlocked ? " unlocked" : "");
+    banner.innerHTML = unlocked
+      ? `🎉 <strong>Endgame packs unlocked!</strong> You collected all ${total} base buddies.`
+      : `🔒 Collect all base buddies to unlock endgame packs — <strong>${collected}/${total}</strong> collected`;
+    grid.appendChild(banner);
+  }
+
   PACKS.forEach(p => {
     const hasToken = (State.tokens[p.id] || 0) > 0;
     const cur = p.currency === "gems" ? State.gems : State.coins;
     const affordable = cur >= p.price;
-    const locked = !hasToken && !affordable;
+    const unlockedPack = isPackUnlocked(p);
+    const locked = !unlockedPack || (!hasToken && !affordable);
     const symbol = p.currency === "gems" ? "💎" : "🪙";
 
     const rarityTags = p.drops.map(d =>
@@ -487,16 +585,21 @@ function renderShop() {
     const bulkQuantities = [5, 10, 20, 50, 100];
     const bulkButtons = bulkQuantities.map(n => {
       const total = p.price * n;
-      const can = cur >= total;
+      const can = cur >= total && unlockedPack;
       return `<button class="bulk-btn" data-qty="${n}" ${can ? "" : "disabled"} title="${total} ${symbol}">×${n}</button>`;
     }).join("");
-    const maxQty = Math.floor(cur / p.price);
+    const maxQty = unlockedPack ? Math.floor(cur / p.price) : 0;
     const maxButton = `<button class="bulk-btn bulk-btn-max" data-qty="${maxQty}" ${maxQty > 0 ? "" : "disabled"} title="${maxQty * p.price} ${symbol}">MAX ×${maxQty}</button>`;
 
     const card = document.createElement("div");
-    card.className = "pack-card" + (locked ? " locked" : "") + (hasToken ? " has-token" : "");
+    card.className = "pack-card" + (locked ? " locked" : "") + (hasToken ? " has-token" : "") + (p.requiresAll ? " endgame" : "");
+    const lockOverlay = !unlockedPack
+      ? `<div class="lock-overlay">🔒<div>Collect all base buddies</div></div>`
+      : "";
     card.innerHTML = `
+      ${lockOverlay}
       ${hasToken ? `<div class="pack-token-badge">FREE x${State.tokens[p.id]}</div>` : ""}
+      ${p.requiresAll && unlockedPack ? `<div class="pack-new-badge">⭐ ENDGAME</div>` : ""}
       <div class="pack-emoji">${p.emoji}</div>
       <div class="pack-name">${p.name}</div>
       <div class="pack-desc">${p.desc || ""}</div>
@@ -514,6 +617,7 @@ function renderShop() {
     card.querySelectorAll(".bulk-btn").forEach(b => {
       b.onclick = (e) => {
         e.stopPropagation();
+        if (!unlockedPack) return;
         const qty = parseInt(b.dataset.qty);
         bulkOpenPack(p, qty);
       };
