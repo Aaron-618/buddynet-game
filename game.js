@@ -57,14 +57,14 @@ const PACKS = [
         { name: "Spark", emoji: "✨" }
       ]},
       { rarity: "rare", weight: 32.9, buddies: [
-        { name: "Blizzard", emoji: "❄️" },
+        { name: "Blizzard", emoji: "🌨️" },
         { name: "Zap", emoji: "⚡" },
         { name: "Gale", emoji: "🌬️" }
       ]},
       { rarity: "epic", weight: 16.6, buddies: [
         { name: "Volcano", emoji: "🌋" },
         { name: "Tornado", emoji: "🌪️" },
-        { name: "Earthquake", emoji: "🌐" }
+        { name: "Earthquake", emoji: "💥" }
       ]},
       { rarity: "legendary", weight: 0.45, buddies: [
         { name: "Flame Lizard", emoji: "🦎" }
@@ -126,7 +126,7 @@ const PACKS = [
       ]},
       { rarity: "epic", weight: 17, buddies: [
         { name: "Bald Eagle", emoji: "🦅" },
-        { name: "Wolverine", emoji: "🐺" }
+        { name: "Wolverine", emoji: "🦡" }
       ]},
       { rarity: "legendary", weight: 0.46, buddies: [
         { name: "The Forest Spirit", emoji: "🧚" }
@@ -176,7 +176,7 @@ const PACKS = [
     drops: [
       { rarity: "uncommon", weight: 52, buddies: [
         { name: "Clownfish", emoji: "🐠" },
-        { name: "Starfish", emoji: "⭐" },
+        { name: "Starfish", emoji: "🐚" },
         { name: "Crab", emoji: "🦀" },
         { name: "Jellyfish", emoji: "🪼" }
       ]},
@@ -207,7 +207,7 @@ const PACKS = [
     drops: [
       { rarity: "uncommon", weight: 53, buddies: [
         { name: "Squire", emoji: "🤺" },
-        { name: "Castle Guard", emoji: "🛡️" },
+        { name: "Castle Guard", emoji: "🪖" },
         { name: "Archer", emoji: "🏹" },
         { name: "Goblin", emoji: "👺" }
       ]},
@@ -252,7 +252,7 @@ const PACKS = [
         { name: "Gingerbread Man", emoji: "🍪" }
       ]},
       { rarity: "legendary", weight: 0.44, buddies: [
-        { name: "The Gummy King", emoji: "🐻" }
+        { name: "The Gummy King", emoji: "🤴" }
       ]},
       { rarity: "chroma", weight: 0.04, buddies: [
         { name: "Rainbow Jawbreaker", emoji: "🍡", effect: "rainbow" }
@@ -274,7 +274,7 @@ const PACKS = [
         { name: "Gear", emoji: "⚙️" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
-        { name: "Cyber Dog", emoji: "🐕" },
+        { name: "Cyber Dog", emoji: "🐺" },
         { name: "Mech Suit", emoji: "🦾" },
         { name: "Hoverboard", emoji: "🛹" }
       ]},
