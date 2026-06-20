@@ -1193,6 +1193,45 @@ body {
   /* completely invisible — no border, no hover state */
 }
 
+/* Personal Reveal Mode — only visible to you (toggle Shift+H) */
+body.reveal-spots .hidden-spot {
+  background: radial-gradient(circle, rgba(108,240,194,0.55), rgba(108,240,194,0.05) 70%);
+  border: 2px dashed var(--accent2);
+  border-radius: 50%;
+  cursor: pointer;
+  animation: spotPulse 1.4s ease-in-out infinite;
+}
+body.reveal-spots .hidden-spot::after {
+  content: '✨';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  filter: drop-shadow(0 0 8px var(--accent2));
+  pointer-events: none;
+}
+@keyframes spotPulse {
+  0%, 100% { box-shadow: 0 0 16px var(--accent2), inset 0 0 8px rgba(108,240,194,0.4); }
+  50%      { box-shadow: 0 0 32px var(--accent2), inset 0 0 14px rgba(108,240,194,0.7); }
+}
+
+.reveal-flash {
+  position: fixed; top: 100px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--card); color: var(--accent);
+  padding: 12px 24px; border-radius: 14px;
+  font-weight: 800; letter-spacing: 1px;
+  z-index: 9999;
+  border: 1px solid var(--accent);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  animation: revealFlash 1.4s ease-out forwards;
+}
+@keyframes revealFlash {
+  0% { opacity: 0; transform: translate(-50%, -10px); }
+  20%, 80% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
+}
+
 /* Celebrate "you found one" overlay reuses .endgame-celebrate / .ec-card.secret-card */
 .endgame-celebrate.hidden-celebrate {
   background: radial-gradient(circle, rgba(108,240,194,0.25), rgba(0,0,0,0.92));

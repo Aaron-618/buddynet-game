@@ -950,6 +950,7 @@ function placeHiddenSpots() {
     spot.className = "hidden-spot";
     spot.style.cssText = `position:fixed;z-index:80;${h.style}`;
     spot.dataset.hidden = h.id;
+    spot.title = h.name;  // visible only when reveal mode adds tooltip
     spot.onclick = (e) => {
       e.stopPropagation();
       e.preventDefault();
@@ -964,6 +965,33 @@ function placeHiddenSpots() {
     document.body.appendChild(spot);
   });
 }
+
+// ---------- PERSONAL REVEAL MODE ----------
+// Glow only appears on YOUR device — stored in YOUR localStorage.
+// Other people opening the URL see normal invisible spots unless they enable it too.
+function applyRevealMode() {
+  if (localStorage.getItem("bn_reveal_hidden") === "true") {
+    document.body.classList.add("reveal-spots");
+  } else {
+    document.body.classList.remove("reveal-spots");
+  }
+}
+function toggleRevealMode() {
+  const current = localStorage.getItem("bn_reveal_hidden") === "true";
+  localStorage.setItem("bn_reveal_hidden", current ? "false" : "true");
+  applyRevealMode();
+  // brief flash so user knows it switched
+  const flash = document.createElement("div");
+  flash.className = "reveal-flash";
+  flash.textContent = current ? "🔒 Reveal OFF" : "✨ Reveal ON";
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 1400);
+}
+document.addEventListener("keydown", (e) => {
+  if (e.shiftKey && (e.key === "H" || e.key === "h")) {
+    toggleRevealMode();
+  }
+});
 
 function celebrateHiddenFind(h) {
   const overlay = document.createElement("div");
@@ -2644,6 +2672,7 @@ save();
 
 // Place invisible hidden-buddy click targets after the initial render
 setTimeout(() => { try { placeHiddenSpots(); } catch(e){} }, 50);
+applyRevealMode();
 
 setupNav();
 setupGameNav();
