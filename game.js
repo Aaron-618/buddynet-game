@@ -2805,7 +2805,7 @@ applyRevealMode();
 
 // ---------- 15-MINUTE PLAY REWARD ----------
 const PLAY_REWARD_INTERVAL = 15 * 60; // seconds
-const PLAY_REWARD_AMOUNT   = 1000000; // 1,000,000 coins
+const PLAY_REWARD_AMOUNT   = 10000; // 10,000 coins
 
 function showPlayRewardFlash(amount) {
   const flash = document.createElement("div");
@@ -2818,8 +2818,8 @@ function showPlayRewardFlash(amount) {
     </div>
   `;
   document.body.appendChild(flash);
-  setTimeout(() => flash.classList.add("prf-out"), 2200);
-  setTimeout(() => flash.remove(), 2700);
+  setTimeout(() => flash.classList.add("prf-out"), 1100);
+  setTimeout(() => flash.remove(), 1300);
 }
 
 setInterval(() => {
