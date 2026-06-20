@@ -26,12 +26,6 @@ const SECRET_BUDDIES = [
     hint: "Open 200 packs total."
   },
   {
-    id: "secret_wheel_master", name: "Wheel Master", emoji: "🎡",
-    rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
-    unlock: { type: "wheel_spins", target: 30 },
-    hint: "Spin the Daily Wheel 30 times."
-  },
-  {
     id: "secret_battle_hero", name: "Battle Hero", emoji: "⚔️",
     rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
     unlock: { type: "games_won", target: 25 },
@@ -1711,7 +1705,7 @@ function spinWheel() {
   // Center of segment idx is at idx*45 + 22.5 degrees clockwise from top.
   // We rotate the wheel so that segment center aligns with pointer (top).
   // That means we rotate by -(idx*45 + 22.5), plus a bunch of full spins.
-  const fullSpins = 6;
+  const fullSpins = 3;
   const targetSpin = wheelRotation + fullSpins * 360 + (360 - (idx * 45 + 22.5));
   wheelRotation = targetSpin;
   $("wheel").style.transform = `rotate(${wheelRotation}deg)`;
@@ -1726,7 +1720,7 @@ function spinWheel() {
     renderShop();
     updateWheelUI();
     maybeUnlockSecrets();
-  }, 4700);
+  }, 2100);
 }
 
 function applyWheelReward(slot) {
