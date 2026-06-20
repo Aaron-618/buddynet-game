@@ -11,9 +11,57 @@ const RARITIES = {
   epic:      { name: "Epic",      color: "#a855f7", sell: 75 },
   legendary: { name: "Legendary", color: "#f59e0b", sell: 250 },
   chroma:    { name: "Chroma",    color: "#ff6b9d", sell: 300 },
-  mystical:  { name: "Mystical",  color: "#ff5470", sell: 10000 }
+  mystical:  { name: "Mystical",  color: "#ff5470", sell: 10000 },
+  secret:    { name: "Secret",    color: "#ffffff", sell: 50000 }
 };
-const RARITY_ORDER = ["common", "uncommon", "rare", "epic", "legendary", "chroma", "mystical"];
+const RARITY_ORDER = ["common", "uncommon", "rare", "epic", "legendary", "chroma", "mystical", "secret"];
+
+// ---------- SECRET BUDDIES ----------
+// Unlocked by playing — never come from packs.
+const SECRET_BUDDIES = [
+  {
+    id: "secret_void_walker", name: "Void Walker", emoji: "🌑",
+    rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
+    unlock: { type: "packs_opened", target: 200 },
+    hint: "Open 200 packs total."
+  },
+  {
+    id: "secret_wheel_master", name: "Wheel Master", emoji: "🎡",
+    rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
+    unlock: { type: "wheel_spins", target: 30 },
+    hint: "Spin the Daily Wheel 30 times."
+  },
+  {
+    id: "secret_battle_hero", name: "Battle Hero", emoji: "⚔️",
+    rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
+    unlock: { type: "games_won", target: 25 },
+    hint: "Win 25 game-mode battles."
+  },
+  {
+    id: "secret_lucky_phantom", name: "Lucky Phantom", emoji: "🍀",
+    rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
+    unlock: { type: "mysticals_pulled", target: 1 },
+    hint: "Pull any Mystical from a pack."
+  },
+  {
+    id: "secret_tycoon", name: "Tycoon", emoji: "💰",
+    rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
+    unlock: { type: "coins_held", target: 100000 },
+    hint: "Have 100,000 coins at once."
+  },
+  {
+    id: "secret_collector_supreme", name: "Collector Supreme", emoji: "👑",
+    rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
+    unlock: { type: "all_base", target: 1 },
+    hint: "Collect all 80 base buddies."
+  },
+  {
+    id: "secret_eternal", name: "The Eternal", emoji: "♾️",
+    rarity: "secret", sell: 100000, pack: "Secret Achievement", packId: "secret",
+    unlock: { type: "all_non_secret", target: 1 },
+    hint: "Collect every base and endgame buddy."
+  }
+];
 
 // ---------- PACKS ----------
 // Each drop entry: { rarity, weight (percent), buddies: [{name, emoji, sell?}] }
@@ -673,6 +721,17 @@ function buildBuddyIndex() {
 }
 buildBuddyIndex();
 
+// Register secret buddies into the same indexes so the Dex / sell / lookup all see them
+SECRET_BUDDIES.forEach(s => {
+  const buddy = {
+    id: s.id, name: s.name, emoji: s.emoji,
+    rarity: s.rarity, pack: s.pack, packId: s.packId,
+    sell: s.sell, effect: "secret-shimmer", unlock: s.unlock, hint: s.hint, secret: true
+  };
+  BUDDIES.push(buddy);
+  BUDDY_BY_ID[s.id] = buddy;
+});
+
 // ---------- DAILY WHEEL ----------
 const WHEEL_SLOTS = [
   { weight: 35,  label: "20",       reward: { type: "coins", amount: 20 } },
@@ -695,6 +754,7 @@ const State = {
   tokens: JSON.parse(localStorage.getItem("bn_tokens") || "{}"),
   lastSpin: parseInt(localStorage.getItem("bn_lastSpin") || "0"),
   endgameUnlocked: localStorage.getItem("bn_endgame") === "true",
+  achievements: JSON.parse(localStorage.getItem("bn_achievements") || '{"wheel_spins":0,"games_won":0,"mysticals_pulled":0}'),
   filterRarity: "all",
   filterPack: "all"
 };
@@ -707,6 +767,7 @@ function save() {
   localStorage.setItem("bn_tokens", JSON.stringify(State.tokens));
   localStorage.setItem("bn_lastSpin", State.lastSpin);
   localStorage.setItem("bn_endgame", State.endgameUnlocked ? "true" : "false");
+  localStorage.setItem("bn_achievements", JSON.stringify(State.achievements));
 }
 
 // ---------- UTILS ----------
@@ -722,7 +783,8 @@ const RARITY_EMOJI_STYLE = {
   epic:      "google",
   legendary: "samsung",
   chroma:    "samsung",
-  mystical:  "samsung"
+  mystical:  "samsung",
+  secret:    "samsung"
 };
 
 function buddyImg(emoji, cls = "", rarity = "", buddyId = "") {
@@ -785,6 +847,63 @@ function checkEndgameUnlock() {
 function isPackUnlocked(pack) {
   if (!pack.requiresAll) return true;
   return State.endgameUnlocked;
+}
+
+// ---------- SECRET BUDDIES ----------
+function progressFor(unlock) {
+  switch (unlock.type) {
+    case "packs_opened":    return State.packsOpened;
+    case "wheel_spins":     return State.achievements.wheel_spins || 0;
+    case "games_won":       return State.achievements.games_won || 0;
+    case "mysticals_pulled":return State.achievements.mysticals_pulled || 0;
+    case "coins_held":      return State.coins;
+    case "all_base":        return baseCollectedCount() >= baseBuddies().length ? 1 : 0;
+    case "all_non_secret":  {
+      const nonSecret = BUDDIES.filter(b => !b.secret);
+      return nonSecret.every(b => ownedCount(b.id) > 0) ? 1 : 0;
+    }
+    default: return 0;
+  }
+}
+
+function checkSecretUnlocks() {
+  const newlyUnlocked = [];
+  SECRET_BUDDIES.forEach(s => {
+    if (ownedCount(s.id) > 0) return;
+    if (progressFor(s.unlock) >= s.unlock.target) {
+      State.owned[s.id] = 1;
+      newlyUnlocked.push(s);
+    }
+  });
+  if (newlyUnlocked.length > 0) save();
+  return newlyUnlocked;
+}
+
+function celebrateSecretUnlock(buddy) {
+  const overlay = document.createElement("div");
+  overlay.className = "endgame-celebrate secret-celebrate";
+  overlay.innerHTML = `
+    <div class="ec-card secret-card">
+      <div class="ec-emoji">${buddy.emoji}</div>
+      <h1>SECRET BUDDY UNLOCKED!</h1>
+      <p><strong>${buddy.name}</strong><br>${buddy.hint}</p>
+      <button class="big-btn" id="ecOkSecret">View Collection</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById("ecOkSecret").onclick = () => {
+    overlay.remove();
+    show("dex");
+  };
+}
+
+function maybeUnlockSecrets() {
+  const unlocked = checkSecretUnlocks();
+  unlocked.forEach((s, i) => setTimeout(() => celebrateSecretUnlock(s), i * 400));
+  if (unlocked.length > 0) {
+    updateWallet();
+    renderDex();
+  }
 }
 
 function celebrateEndgameUnlock() {
@@ -945,6 +1064,7 @@ function bulkOpenPack(pack, qty) {
     const buddy = pickFromPack(pack);
     const wasNew = !discovered(buddy.id);
     State.owned[buddy.id] = (State.owned[buddy.id] || 0) + 1;
+    if (buddy.rarity === "mystical") State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
     if (wasNew) newCount++;
     if (!results[buddy.id]) results[buddy.id] = { buddy, count: 0, isNew: wasNew };
     results[buddy.id].count++;
@@ -958,6 +1078,7 @@ function bulkOpenPack(pack, qty) {
   renderShop();
   renderDex();
   if (!wasUnlocked && State.endgameUnlocked) celebrateEndgameUnlock();
+  maybeUnlockSecrets();
   showBulkResult(pack, qty, totalCost, results, newCount, rarityTally);
 }
 
@@ -1028,6 +1149,7 @@ function openPack(pack) {
   const buddy = pickFromPack(pack);
   const isNew = !discovered(buddy.id);
   State.owned[buddy.id] = (State.owned[buddy.id] || 0) + 1;
+  if (buddy.rarity === "mystical") State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
   const wasUnlocked = State.endgameUnlocked;
   checkEndgameUnlock();
   save();
@@ -1035,6 +1157,7 @@ function openPack(pack) {
   renderShop();
   renderDex();
   if (!wasUnlocked && State.endgameUnlocked) celebrateEndgameUnlock();
+  maybeUnlockSecrets();
 
   // Animation
   const overlay = $("packOpen");
@@ -1084,8 +1207,10 @@ function renderDex() {
       const p = PACKS.find(pk => pk.id === b.packId);
       return p && p.requiresAll;
     };
-    const baseVis = visible.filter(b => !isEndgame(b));
+    const isSecret = b => !!b.secret;
+    const baseVis = visible.filter(b => !isEndgame(b) && !isSecret(b));
     const endgameVis = visible.filter(b => isEndgame(b));
+    const secretVis = visible.filter(b => isSecret(b));
 
     function renderCard(b) {
       const count = ownedCount(b.id);
@@ -1117,6 +1242,41 @@ function renderDex() {
       h.innerHTML = `⭐ ENDGAME BUDDIES <span class="dex-h-count">${endgameOwnedC}/${endgameVis.length}</span>${State.endgameUnlocked ? "" : " <span class=\"dex-h-locked\">🔒 Locked</span>"}`;
       grid.appendChild(h);
       endgameVis.forEach(renderCard);
+    }
+    if (secretVis.length > 0) {
+      const secretOwnedC = secretVis.filter(b => discovered(b.id)).length;
+      const h = document.createElement("div");
+      h.className = "dex-section-header secret-header";
+      h.innerHTML = `🌟 SECRET BUDDIES <span class="dex-h-count">${secretOwnedC}/${secretVis.length}</span> <span class="dex-h-hint">Unlock by playing</span>`;
+      grid.appendChild(h);
+      secretVis.forEach(b => {
+        const seen = discovered(b.id);
+        const count = ownedCount(b.id);
+        const card = document.createElement("div");
+        card.className = "buddy-card border-secret" + (seen ? "" : " locked");
+        if (seen) {
+          card.innerHTML = `
+            ${count > 1 ? `<div class="buddy-count">x${count}</div>` : ""}
+            <div class="buddy-emoji">${buddyFrame(b.emoji, b.rarity, "", b.effect, b.id)}</div>
+            <div class="buddy-name">${b.name}</div>
+            <div class="buddy-rarity r-secret">SECRET</div>
+          `;
+          card.onclick = () => showBuddyDetail(b);
+        } else {
+          // Hint card with progress bar
+          const progress = progressFor(b.unlock);
+          const target = b.unlock.target;
+          const pct = Math.min(100, Math.round((progress / target) * 100));
+          card.innerHTML = `
+            <div class="buddy-emoji"><div class="b-frame locked-frame secret-locked">?</div></div>
+            <div class="buddy-name">???</div>
+            <div class="secret-hint">${b.hint}</div>
+            <div class="secret-progress"><div class="secret-progress-fill" style="width:${pct}%"></div></div>
+            <div class="secret-progress-text">${Math.min(progress, target)}/${target}</div>
+          `;
+        }
+        grid.appendChild(card);
+      });
     }
   }
   renderFilters();
@@ -1331,11 +1491,13 @@ function spinWheel() {
   setTimeout(() => {
     wheelSpinning = false;
     State.lastSpin = Date.now();
+    State.achievements.wheel_spins = (State.achievements.wheel_spins || 0) + 1;
     applyWheelReward(WHEEL_SLOTS[idx]);
     save();
     updateWallet();
     renderShop();
     updateWheelUI();
+    maybeUnlockSecrets();
   }, 4700);
 }
 
@@ -1484,9 +1646,11 @@ function endGame({ win, title, coins, stats }) {
   GameRunner.onTick = null;
   coins = Math.round(coins);
   State.coins += coins;
+  if (win) State.achievements.games_won = (State.achievements.games_won || 0) + 1;
   save();
   updateWallet();
   renderShop();
+  maybeUnlockSecrets();
   $("gameResultIcon").textContent = win ? "🏆" : "💪";
   $("gameResultTitle").textContent = title || (win ? "VICTORY!" : "GAME OVER");
   $("gameResultTitle").style.color = win ? "var(--accent2)" : "var(--pink)";
@@ -2374,6 +2538,7 @@ Object.keys(State.owned).forEach(id => {
 });
 // Catch users who already have all base buddies from before the endgame system
 checkEndgameUnlock();
+checkSecretUnlocks();
 save();
 
 setupNav();

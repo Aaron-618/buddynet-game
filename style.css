@@ -1155,6 +1155,59 @@ body {
   background: linear-gradient(90deg, rgba(245,158,11,0.18), transparent);
   border-left-color: var(--r-legendary);
 }
+.dex-section-header.secret-header {
+  background: linear-gradient(90deg, rgba(255,255,255,0.12), transparent);
+  border-left-color: #ffffff;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+.dex-h-hint {
+  background: rgba(255,255,255,0.1); color: var(--dim);
+  padding: 4px 10px; border-radius: 12px;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+}
+.secret-locked {
+  background: linear-gradient(135deg, #000 0%, #1a1a2e 100%) !important;
+  color: #fff !important;
+  border: 2px dashed rgba(255,255,255,0.4) !important;
+  text-shadow: 0 0 12px rgba(255,255,255,0.8);
+  font-size: 38px !important; font-weight: 900 !important;
+  animation: secretMystery 2.5s ease-in-out infinite !important;
+}
+@keyframes secretMystery {
+  0%, 100% { box-shadow: 0 0 12px rgba(255,255,255,0.3); }
+  50% { box-shadow: 0 0 28px rgba(255,255,255,0.7); }
+}
+.secret-hint {
+  color: var(--dim); font-size: 10px; line-height: 1.3;
+  padding: 0 6px; margin-top: 6px; min-height: 26px;
+}
+.secret-progress {
+  height: 5px; background: rgba(255,255,255,0.1);
+  border-radius: 3px; margin: 6px 8px 2px; overflow: hidden;
+}
+.secret-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), #ffffff);
+  transition: width 0.3s;
+}
+.secret-progress-text {
+  font-size: 10px; color: var(--accent); font-weight: 800;
+  text-align: center;
+}
+
+/* Secret unlock celebration */
+.endgame-celebrate.secret-celebrate {
+  background: radial-gradient(circle, rgba(255,255,255,0.25), rgba(0,0,0,0.95));
+}
+.ec-card.secret-card {
+  border-color: #ffffff;
+  box-shadow: 0 0 80px rgba(255,255,255,0.6);
+  background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 100%);
+}
+.ec-card.secret-card h1 {
+  background: linear-gradient(45deg, #ffffff, var(--accent), #ffffff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
 .dex-h-count {
   background: rgba(0,0,0,0.3); color: var(--accent);
   padding: 4px 12px; border-radius: 12px;
@@ -1198,6 +1251,12 @@ body {
 .r-legendary { background: var(--r-legendary); color: #1a1a1a; }
 .r-chroma { background: var(--r-chroma); color: #fff; background-size: 300% 300%; animation: chroma 4s linear infinite; }
 .r-mystical { background: var(--r-mystical); color: #fff; }
+.r-secret {
+  background: linear-gradient(135deg, #000 0%, #1a1a2e 50%, #000 100%);
+  color: #fff;
+  border: 1px solid #ffffff;
+  text-shadow: 0 0 6px #fff;
+}
 @keyframes chroma {
   0% { background-position: 0% 50%; }
   100% { background-position: 300% 50%; }
@@ -1210,6 +1269,11 @@ body {
 .buddy-card.border-legendary, .bulk-buddy.border-legendary { border-color: var(--r-legendary); box-shadow: 0 0 20px rgba(245,158,11,0.5); }
 .buddy-card.border-chroma, .bulk-buddy.border-chroma { border-color: var(--pink); box-shadow: 0 0 24px var(--pink); }
 .buddy-card.border-mystical, .bulk-buddy.border-mystical { border-color: var(--r-mystical); box-shadow: 0 0 28px var(--r-mystical); }
+.buddy-card.border-secret, .bulk-buddy.border-secret {
+  border-color: #ffffff;
+  background: linear-gradient(180deg, #0a0a1a 0%, #1a1a2e 100%);
+  box-shadow: 0 0 30px rgba(255,255,255,0.45);
+}
 
 /* ---------- PACK OPEN OVERLAY ---------- */
 .overlay {
