@@ -39,9 +39,11 @@
       <p class="hero-sub">Collect every buddy. Open every pack.</p>
 
       <div class="quick-stats">
-        <div class="qs"><span class="qs-num" id="ownedCount">0</span><span class="qs-lbl">Buddies Owned</span></div>
-        <div class="qs"><span class="qs-num" id="totalCount">0</span><span class="qs-lbl">Total Buddies</span></div>
+        <div class="qs"><span class="qs-num" id="baseProgress">0/80</span><span class="qs-lbl">Base Buddies</span></div>
+        <div class="qs" id="endgameStatQs"><span class="qs-num" id="endgameProgress">🔒</span><span class="qs-lbl">Endgame Buddies</span></div>
         <div class="qs"><span class="qs-num" id="packsOpened">0</span><span class="qs-lbl">Packs Opened</span></div>
+        <span id="ownedCount" hidden></span>
+        <span id="totalCount" hidden></span>
       </div>
 
       <div class="home-actions">

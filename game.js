@@ -809,9 +809,25 @@ function celebrateEndgameUnlock() {
 function updateWallet() {
   $("walletCoins").textContent = State.coins.toLocaleString();
   $("walletGems").textContent = State.gems.toLocaleString();
-  const discoveredCount = Object.keys(State.owned).length;
-  $("ownedCount").textContent = discoveredCount;
-  $("totalCount").textContent = BUDDIES.length;
+
+  const baseTotal = baseBuddies().length;
+  const baseOwned = baseCollectedCount();
+  $("baseProgress").textContent = `${baseOwned}/${baseTotal}` + (baseOwned >= baseTotal ? " ✓" : "");
+  $("baseProgress").style.color = baseOwned >= baseTotal ? "var(--green)" : "var(--accent)";
+
+  const endgameBuddiesAll = BUDDIES.filter(b => {
+    const p = PACKS.find(pk => pk.id === b.packId);
+    return p && p.requiresAll;
+  });
+  const endgameOwned = endgameBuddiesAll.filter(b => ownedCount(b.id) > 0).length;
+  if (State.endgameUnlocked) {
+    $("endgameProgress").textContent = `${endgameOwned}/${endgameBuddiesAll.length}`;
+    $("endgameProgress").style.color = "var(--accent)";
+  } else {
+    $("endgameProgress").textContent = "🔒";
+    $("endgameProgress").style.color = "var(--dim)";
+  }
+
   $("packsOpened").textContent = State.packsOpened;
 
   const wheelReady = Date.now() - State.lastSpin >= WHEEL_COOLDOWN_MS;
