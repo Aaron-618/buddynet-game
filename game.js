@@ -68,15 +68,15 @@ const SECRET_BUDDIES = [
 // Discover them by clicking exactly on the right spot.
 const HIDDEN_BUDDIES = [
   { id: "hidden_logo_ghost",   name: "Logo Ghost",     emoji: "👻", sell: 75000,
-    screen: "home", style: "top:18px;left:50%;width:64px;height:38px;transform:translateX(-50%);" },
+    screen: "home", style: "top:130px;left:50%;width:80px;height:50px;transform:translateX(-50%);" },
   { id: "hidden_corner_lurker",name: "Corner Lurker",  emoji: "🕷️", sell: 75000,
-    screen: "home", style: "bottom:10px;right:10px;width:60px;height:60px;" },
+    screen: "home", style: "bottom:20px;right:20px;width:60px;height:60px;" },
   { id: "hidden_market_mole",  name: "Market Mole",    emoji: "🐀", sell: 75000,
-    screen: "shop", style: "top:80px;right:24px;width:50px;height:50px;" },
+    screen: "shop", style: "top:110px;right:30px;width:50px;height:50px;" },
   { id: "hidden_dex_eye",      name: "Dex Eye",        emoji: "👁️", sell: 75000,
-    screen: "dex",  style: "top:30px;left:14px;width:54px;height:54px;" },
+    screen: "dex",  style: "top:120px;left:24px;width:54px;height:54px;" },
   { id: "hidden_play_pixie",   name: "Play Pixie",     emoji: "🧚", sell: 75000,
-    screen: "play", style: "bottom:80px;left:18px;width:60px;height:60px;" }
+    screen: "play", style: "bottom:30px;left:24px;width:60px;height:60px;" }
 ];
 
 // ---------- PACKS ----------
