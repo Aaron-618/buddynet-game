@@ -714,6 +714,9 @@ const PACKS = [
   }
 ];
 
+// Merge Tier 3 packs (loaded from tier3.js) into the master PACKS list
+if (typeof TIER3_PACKS !== "undefined") TIER3_PACKS.forEach(p => PACKS.push(p));
+
 // ---------- BUILD FLAT BUDDY INDEX ----------
 const BUDDIES = [];   // flat list
 const BUDDY_BY_ID = {};
@@ -796,6 +799,7 @@ const State = {
   tokens: (() => { try { return JSON.parse(localStorage.getItem("bn_tokens") || "{}") || {}; } catch { return {}; } })(),
   lastSpin: _num("bn_lastSpin", 0),
   endgameUnlocked: localStorage.getItem("bn_endgame") === "true",
+  ultraUnlocked: localStorage.getItem("bn_ultra") === "true",
   achievements: _achievements(),
   filterRarity: "all",
   filterPack: "all"
@@ -809,6 +813,7 @@ function save() {
   localStorage.setItem("bn_tokens", JSON.stringify(State.tokens));
   localStorage.setItem("bn_lastSpin", State.lastSpin);
   localStorage.setItem("bn_endgame", State.endgameUnlocked ? "true" : "false");
+  localStorage.setItem("bn_ultra", State.ultraUnlocked ? "true" : "false");
   localStorage.setItem("bn_achievements", JSON.stringify(State.achievements));
 }
 
@@ -887,7 +892,35 @@ function checkEndgameUnlock() {
   }
   return false;
 }
+
+// Tier 3 helpers
+function tier3Packs() { return PACKS.filter(p => p.tier3); }
+function endgameOnlyBuddies() {
+  return BUDDIES.filter(b => {
+    const p = PACKS.find(pk => pk.id === b.packId);
+    return p && p.requiresAll && !p.tier3;
+  });
+}
+function tier3Buddies() {
+  return BUDDIES.filter(b => {
+    const p = PACKS.find(pk => pk.id === b.packId);
+    return p && p.tier3;
+  });
+}
+function checkUltraUnlock() {
+  if (State.ultraUnlocked) return true;
+  const baseOk = baseBuddies().every(b => ownedCount(b.id) > 0);
+  const endgameOk = endgameOnlyBuddies().every(b => ownedCount(b.id) > 0);
+  if (baseOk && endgameOk && endgameOnlyBuddies().length > 0) {
+    State.ultraUnlocked = true;
+    save();
+    return true;
+  }
+  return false;
+}
+
 function isPackUnlocked(pack) {
+  if (pack.tier3) return State.ultraUnlocked;
   if (!pack.requiresAll) return true;
   return State.endgameUnlocked;
 }
@@ -1042,6 +1075,28 @@ function celebrateEndgameUnlock() {
   };
 }
 
+function celebrateUltraUnlock() {
+  const overlay = document.createElement("div");
+  overlay.className = "endgame-celebrate ultra-celebrate";
+  const tier3Count = tier3Buddies().length;
+  const tier3PackCount = tier3Packs().length;
+  overlay.innerHTML = `
+    <div class="ec-card ultra-card">
+      <div class="ec-emoji">🏆🎊🏆</div>
+      <h1>CONGRATULATIONS!</h1>
+      <div style="font-size:14px;color:var(--accent2);letter-spacing:3px;font-weight:800;margin-bottom:8px">★ TIER 3 ULTRA UNLOCKED ★</div>
+      <p>You collected every buddy in the game.<br>
+      <strong>${tier3PackCount} new packs</strong> with <strong>${tier3Count} more buddies</strong> are now in the Market.</p>
+      <button class="big-btn" id="ecOkUltra">Open Ultra Market</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById("ecOkUltra").onclick = () => {
+    overlay.remove();
+    show("shop");
+  };
+}
+
 // ---------- HUD ----------
 function updateWallet() {
   $("walletCoins").textContent = State.coins.toLocaleString();
@@ -1092,22 +1147,37 @@ function renderShop() {
   const grid = $("packGrid");
   grid.innerHTML = "";
 
-  // Show unlock progress / celebration if any endgame packs exist
-  const endgamePacks = PACKS.filter(p => p.requiresAll);
-  const unlocked = State.endgameUnlocked;
-  if (endgamePacks.length > 0) {
+  // Top-of-grid status banner (varies by which tier the player is on)
+  const ultra = State.ultraUnlocked;
+  const endgameOn = State.endgameUnlocked;
+  const t3Packs = PACKS.filter(p => p.tier3);
+
+  if (ultra) {
+    const banner = document.createElement("div");
+    banner.className = "endgame-banner unlocked ultra-banner";
+    banner.innerHTML = `★ <strong>TIER 3 ULTRA MARKET</strong> ★ — base and endgame packs are sealed. ${t3Packs.length} ultra packs available.`;
+    grid.appendChild(banner);
+  } else if (endgameOn) {
+    const endgameBuds = endgameOnlyBuddies();
+    const collectedEnd = endgameBuds.filter(b => ownedCount(b.id) > 0).length;
+    const banner = document.createElement("div");
+    banner.className = "endgame-banner unlocked";
+    banner.innerHTML = `🏆 <strong>ENDGAME MARKET</strong> — base packs are sealed. Collect every endgame buddy to unlock Tier 3 (<strong>${collectedEnd}/${endgameBuds.length}</strong>).`;
+    grid.appendChild(banner);
+  } else {
     const total = baseBuddies().length;
     const collected = baseCollectedCount();
     const banner = document.createElement("div");
-    banner.className = "endgame-banner" + (unlocked ? " unlocked" : "");
-    banner.innerHTML = unlocked
-      ? `🏆 <strong>ENDGAME MARKET</strong> — base packs are sealed. 10 endgame packs available.`
-      : `🔒 Collect all base buddies to unlock endgame packs — <strong>${collected}/${total}</strong> collected`;
+    banner.className = "endgame-banner";
+    banner.innerHTML = `🔒 Collect all base buddies to unlock endgame packs — <strong>${collected}/${total}</strong> collected`;
     grid.appendChild(banner);
   }
 
-  // Once endgame is unlocked, hide base packs entirely
-  const visiblePacks = unlocked ? PACKS.filter(p => p.requiresAll) : PACKS;
+  // Pack visibility cascades by tier
+  let visiblePacks;
+  if (ultra) visiblePacks = PACKS.filter(p => p.tier3);
+  else if (endgameOn) visiblePacks = PACKS.filter(p => p.requiresAll && !p.tier3);
+  else visiblePacks = PACKS.filter(p => !p.requiresAll);
   visiblePacks.forEach(p => {
     const hasToken = (State.tokens[p.id] || 0) > 0;
     const cur = p.currency === "gems" ? State.gems : State.coins;
@@ -1189,13 +1259,16 @@ function bulkOpenPack(pack, qty) {
     rarityTally[buddy.rarity] = (rarityTally[buddy.rarity] || 0) + 1;
   }
 
-  const wasUnlocked = State.endgameUnlocked;
+  const wasEnd = State.endgameUnlocked;
+  const wasUltra = State.ultraUnlocked;
   checkEndgameUnlock();
+  checkUltraUnlock();
   save();
   updateWallet();
   renderShop();
   renderDex();
-  if (!wasUnlocked && State.endgameUnlocked) celebrateEndgameUnlock();
+  if (!wasEnd && State.endgameUnlocked) celebrateEndgameUnlock();
+  if (!wasUltra && State.ultraUnlocked) setTimeout(celebrateUltraUnlock, wasEnd ? 0 : 600);
   maybeUnlockSecrets();
   showBulkResult(pack, qty, totalCost, results, newCount, rarityTally);
 }
@@ -1268,13 +1341,16 @@ function openPack(pack) {
   const isNew = !discovered(buddy.id);
   State.owned[buddy.id] = (State.owned[buddy.id] || 0) + 1;
   if (buddy.rarity === "mystical") State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
-  const wasUnlocked = State.endgameUnlocked;
+  const wasEnd = State.endgameUnlocked;
+  const wasUltra = State.ultraUnlocked;
   checkEndgameUnlock();
+  checkUltraUnlock();
   save();
   updateWallet();
   renderShop();
   renderDex();
-  if (!wasUnlocked && State.endgameUnlocked) celebrateEndgameUnlock();
+  if (!wasEnd && State.endgameUnlocked) celebrateEndgameUnlock();
+  if (!wasUltra && State.ultraUnlocked) setTimeout(celebrateUltraUnlock, wasEnd ? 0 : 600);
   maybeUnlockSecrets();
 
   // Animation
@@ -1321,14 +1397,14 @@ function renderDex() {
   if (visible.length === 0) {
     grid.innerHTML = `<div class="empty-msg">No buddies match this filter.</div>`;
   } else {
-    const isEndgame = b => {
-      const p = PACKS.find(pk => pk.id === b.packId);
-      return p && p.requiresAll;
-    };
+    const packOf = b => PACKS.find(pk => pk.id === b.packId);
+    const isEndgame = b => { const p = packOf(b); return p && p.requiresAll && !p.tier3; };
+    const isTier3  = b => { const p = packOf(b); return p && p.tier3; };
     const isSecret = b => !!b.secret;
     const isHidden = b => !!b.hidden;
-    const baseVis = visible.filter(b => !isEndgame(b) && !isSecret(b) && !isHidden(b));
+    const baseVis = visible.filter(b => !isEndgame(b) && !isTier3(b) && !isSecret(b) && !isHidden(b));
     const endgameVis = visible.filter(b => isEndgame(b));
+    const tier3Vis = visible.filter(b => isTier3(b));
     const secretVis = visible.filter(b => isSecret(b));
     const hiddenVis = visible.filter(b => isHidden(b) && discovered(b.id));
 
@@ -1362,6 +1438,14 @@ function renderDex() {
       h.innerHTML = `⭐ ENDGAME BUDDIES <span class="dex-h-count">${endgameOwnedC}/${endgameVis.length}</span>${State.endgameUnlocked ? "" : " <span class=\"dex-h-locked\">🔒 Locked</span>"}`;
       grid.appendChild(h);
       endgameVis.forEach(renderCard);
+    }
+    if (tier3Vis.length > 0) {
+      const t3OwnedC = tier3Vis.filter(b => discovered(b.id)).length;
+      const h = document.createElement("div");
+      h.className = "dex-section-header tier3-header";
+      h.innerHTML = `★★ TIER 3 ULTRA BUDDIES ★★ <span class="dex-h-count">${t3OwnedC}/${tier3Vis.length}</span>${State.ultraUnlocked ? "" : " <span class=\"dex-h-locked\">🔒 Locked</span>"}`;
+      grid.appendChild(h);
+      tier3Vis.forEach(renderCard);
     }
     // HIDDEN BUDDIES section — only appears once you've found at least one
     if (hiddenVis.length > 0) {
@@ -2715,6 +2799,7 @@ Object.keys(State.owned).forEach(id => {
 });
 // Catch users who already have all base buddies from before the endgame system
 checkEndgameUnlock();
+checkUltraUnlock();
 checkSecretUnlocks();
 save();
 
