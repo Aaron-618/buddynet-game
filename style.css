@@ -1179,6 +1179,24 @@ body {
   color: #fff;
   text-shadow: 0 0 8px rgba(255,255,255,0.5);
 }
+.dex-section-header.hidden-header {
+  background: linear-gradient(90deg, rgba(108,240,194,0.15), transparent);
+  border-left-color: var(--accent2);
+  color: var(--accent2);
+  text-shadow: 0 0 8px rgba(108,240,194,0.5);
+}
+
+/* Invisible click targets for hidden buddies — fully transparent, no cursor hint */
+.hidden-spot {
+  background: transparent;
+  cursor: default;
+  /* completely invisible — no border, no hover state */
+}
+
+/* Celebrate "you found one" overlay reuses .endgame-celebrate / .ec-card.secret-card */
+.endgame-celebrate.hidden-celebrate {
+  background: radial-gradient(circle, rgba(108,240,194,0.25), rgba(0,0,0,0.92));
+}
 .dex-h-hint {
   background: rgba(255,255,255,0.1); color: var(--dim);
   padding: 4px 10px; border-radius: 12px;

@@ -63,6 +63,22 @@ const SECRET_BUDDIES = [
   }
 ];
 
+// ---------- HIDDEN BUDDIES ----------
+// Invisible click targets scattered around the UI. No hints, no "?" placeholder.
+// Discover them by clicking exactly on the right spot.
+const HIDDEN_BUDDIES = [
+  { id: "hidden_logo_ghost",   name: "Logo Ghost",     emoji: "👻", sell: 75000,
+    screen: "home", style: "top:18px;left:50%;width:64px;height:38px;transform:translateX(-50%);" },
+  { id: "hidden_corner_lurker",name: "Corner Lurker",  emoji: "🕷️", sell: 75000,
+    screen: "home", style: "bottom:10px;right:10px;width:60px;height:60px;" },
+  { id: "hidden_market_mole",  name: "Market Mole",    emoji: "🐀", sell: 75000,
+    screen: "shop", style: "top:80px;right:24px;width:50px;height:50px;" },
+  { id: "hidden_dex_eye",      name: "Dex Eye",        emoji: "👁️", sell: 75000,
+    screen: "dex",  style: "top:30px;left:14px;width:54px;height:54px;" },
+  { id: "hidden_play_pixie",   name: "Play Pixie",     emoji: "🧚", sell: 75000,
+    screen: "play", style: "bottom:80px;left:18px;width:60px;height:60px;" }
+];
+
 // ---------- PACKS ----------
 // Each drop entry: { rarity, weight (percent), buddies: [{name, emoji, sell?}] }
 const PACKS = [
@@ -732,6 +748,17 @@ SECRET_BUDDIES.forEach(s => {
   BUDDY_BY_ID[s.id] = buddy;
 });
 
+// Register hidden buddies as well so they integrate with sell, dex, etc.
+HIDDEN_BUDDIES.forEach(h => {
+  const buddy = {
+    id: h.id, name: h.name, emoji: h.emoji,
+    rarity: "secret", pack: "Hidden Find", packId: "hidden",
+    sell: h.sell, effect: "secret-shimmer", hidden: true
+  };
+  BUDDIES.push(buddy);
+  BUDDY_BY_ID[h.id] = buddy;
+});
+
 // ---------- DAILY WHEEL ----------
 const WHEEL_SLOTS = [
   { weight: 35,  label: "20",       reward: { type: "coins", amount: 20 } },
@@ -806,6 +833,7 @@ function buddyFrame(emoji, rarity, sizeClass = "", effect = "", buddyId = "") {
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   $(id).classList.add("active");
+  setTimeout(() => { try { placeHiddenSpots(); } catch(e){} }, 0);
   document.querySelectorAll(".tab-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.nav === id);
   });
@@ -850,6 +878,14 @@ function isPackUnlocked(pack) {
 }
 
 // ---------- SECRET BUDDIES ----------
+function targetFor(unlock) {
+  switch (unlock.type) {
+    case "all_base":       return baseBuddies().length;
+    case "all_non_secret": return BUDDIES.filter(b => !b.secret && !b.hidden).length;
+    default:               return unlock.target;
+  }
+}
+
 function progressFor(unlock) {
   switch (unlock.type) {
     case "packs_opened":    return State.packsOpened;
@@ -857,11 +893,8 @@ function progressFor(unlock) {
     case "games_won":       return State.achievements.games_won || 0;
     case "mysticals_pulled":return State.achievements.mysticals_pulled || 0;
     case "coins_held":      return State.coins;
-    case "all_base":        return baseCollectedCount() >= baseBuddies().length ? 1 : 0;
-    case "all_non_secret":  {
-      const nonSecret = BUDDIES.filter(b => !b.secret);
-      return nonSecret.every(b => ownedCount(b.id) > 0) ? 1 : 0;
-    }
+    case "all_base":        return baseCollectedCount();
+    case "all_non_secret":  return BUDDIES.filter(b => !b.secret && !b.hidden && ownedCount(b.id) > 0).length;
     default: return 0;
   }
 }
@@ -870,7 +903,7 @@ function checkSecretUnlocks() {
   const newlyUnlocked = [];
   SECRET_BUDDIES.forEach(s => {
     if (ownedCount(s.id) > 0) return;
-    if (progressFor(s.unlock) >= s.unlock.target) {
+    if (progressFor(s.unlock) >= targetFor(s.unlock)) {
       State.owned[s.id] = 1;
       newlyUnlocked.push(s);
     }
@@ -904,6 +937,48 @@ function maybeUnlockSecrets() {
     updateWallet();
     renderDex();
   }
+}
+
+// ---------- HIDDEN BUDDIES PLACEMENT ----------
+function placeHiddenSpots() {
+  document.querySelectorAll(".hidden-spot").forEach(s => s.remove());
+  HIDDEN_BUDDIES.forEach(h => {
+    if (ownedCount(h.id) > 0) return;
+    const screenEl = document.getElementById(h.screen);
+    if (!screenEl || !screenEl.classList.contains("active")) return;
+    const spot = document.createElement("div");
+    spot.className = "hidden-spot";
+    spot.style.cssText = `position:fixed;z-index:80;${h.style}`;
+    spot.dataset.hidden = h.id;
+    spot.onclick = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (ownedCount(h.id) > 0) return;
+      State.owned[h.id] = 1;
+      save();
+      spot.remove();
+      celebrateHiddenFind(h);
+      updateWallet();
+      renderDex();
+    };
+    document.body.appendChild(spot);
+  });
+}
+
+function celebrateHiddenFind(h) {
+  const overlay = document.createElement("div");
+  overlay.className = "endgame-celebrate secret-celebrate hidden-celebrate";
+  overlay.innerHTML = `
+    <div class="ec-card secret-card">
+      <div class="ec-emoji">${h.emoji}</div>
+      <div style="font-size:13px;color:var(--accent2);letter-spacing:3px;font-weight:800">🕳 HIDDEN FIND</div>
+      <h1>${h.name}</h1>
+      <p>You found a hidden buddy! Sells for 🪙 ${h.sell.toLocaleString()}.</p>
+      <button class="big-btn" id="ecOkHidden">Keep Exploring</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById("ecOkHidden").onclick = () => overlay.remove();
 }
 
 function celebrateEndgameUnlock() {
@@ -1208,9 +1283,11 @@ function renderDex() {
       return p && p.requiresAll;
     };
     const isSecret = b => !!b.secret;
-    const baseVis = visible.filter(b => !isEndgame(b) && !isSecret(b));
+    const isHidden = b => !!b.hidden;
+    const baseVis = visible.filter(b => !isEndgame(b) && !isSecret(b) && !isHidden(b));
     const endgameVis = visible.filter(b => isEndgame(b));
     const secretVis = visible.filter(b => isSecret(b));
+    const hiddenVis = visible.filter(b => isHidden(b) && discovered(b.id));
 
     function renderCard(b) {
       const count = ownedCount(b.id);
@@ -1243,6 +1320,27 @@ function renderDex() {
       grid.appendChild(h);
       endgameVis.forEach(renderCard);
     }
+    // HIDDEN BUDDIES section — only appears once you've found at least one
+    if (hiddenVis.length > 0) {
+      const h = document.createElement("div");
+      h.className = "dex-section-header hidden-header";
+      h.innerHTML = `🕳 HIDDEN BUDDIES <span class="dex-h-count">${hiddenVis.length} found</span>`;
+      grid.appendChild(h);
+      hiddenVis.forEach(b => {
+        const count = ownedCount(b.id);
+        const card = document.createElement("div");
+        card.className = "buddy-card border-secret";
+        card.innerHTML = `
+          ${count > 1 ? `<div class="buddy-count">x${count}</div>` : ""}
+          <div class="buddy-emoji">${buddyFrame(b.emoji, b.rarity, "", b.effect, b.id)}</div>
+          <div class="buddy-name">${b.name}</div>
+          <div class="buddy-rarity r-secret">HIDDEN</div>
+        `;
+        card.onclick = () => showBuddyDetail(b);
+        grid.appendChild(card);
+      });
+    }
+
     if (secretVis.length > 0) {
       const secretOwnedC = secretVis.filter(b => discovered(b.id)).length;
       const h = document.createElement("div");
@@ -1265,7 +1363,7 @@ function renderDex() {
         } else {
           // Hint card with progress bar
           const progress = progressFor(b.unlock);
-          const target = b.unlock.target;
+          const target = targetFor(b.unlock);
           const pct = Math.min(100, Math.round((progress / target) * 100));
           card.innerHTML = `
             <div class="buddy-emoji"><div class="b-frame locked-frame secret-locked">?</div></div>
@@ -2543,6 +2641,9 @@ Object.keys(State.owned).forEach(id => {
 checkEndgameUnlock();
 checkSecretUnlocks();
 save();
+
+// Place invisible hidden-buddy click targets after the initial render
+setTimeout(() => { try { placeHiddenSpots(); } catch(e){} }, 50);
 
 setupNav();
 setupGameNav();
