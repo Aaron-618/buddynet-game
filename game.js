@@ -1744,7 +1744,6 @@ function renderPlay() {
       <div class="mode-emoji">${m.emoji}</div>
       <div class="mode-name">${m.name}</div>
       <div class="mode-desc">${m.desc}</div>
-      <div class="mode-reward">🪙 up to ${m.maxReward}</div>
     `;
     card.onclick = () => startMode(m.id);
     grid.appendChild(card);
@@ -2210,7 +2209,7 @@ Modes.incubator = {
       updateGameHUD();
     };
 
-    gameTimer(30, () => {
+    gameTimer(45, () => {
       endGame({
         win: GameRunner.coins > 0,
         coins: GameRunner.coins,
