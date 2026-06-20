@@ -773,15 +773,30 @@ const WHEEL_SLOTS = [
 const WHEEL_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
 // ---------- STATE ----------
+function _num(key, fallback) {
+  const v = parseInt(localStorage.getItem(key));
+  return Number.isFinite(v) ? v : fallback;
+}
+function _achievements() {
+  try {
+    const a = JSON.parse(localStorage.getItem("bn_achievements") || "{}") || {};
+    return {
+      wheel_spins:     Number.isFinite(a.wheel_spins)     ? a.wheel_spins     : 0,
+      games_won:       Number.isFinite(a.games_won)       ? a.games_won       : 0,
+      mysticals_pulled:Number.isFinite(a.mysticals_pulled)? a.mysticals_pulled: 0
+    };
+  } catch { return { wheel_spins: 0, games_won: 0, mysticals_pulled: 0 }; }
+}
+
 const State = {
-  coins: parseInt(localStorage.getItem("bn_coins") || "100"),
-  gems: parseInt(localStorage.getItem("bn_gems") || "0"),
-  packsOpened: parseInt(localStorage.getItem("bn_packs") || "0"),
-  owned: JSON.parse(localStorage.getItem("bn_owned") || "{}"),
-  tokens: JSON.parse(localStorage.getItem("bn_tokens") || "{}"),
-  lastSpin: parseInt(localStorage.getItem("bn_lastSpin") || "0"),
+  coins: _num("bn_coins", 100),
+  gems: _num("bn_gems", 0),
+  packsOpened: _num("bn_packs", 0),
+  owned: (() => { try { return JSON.parse(localStorage.getItem("bn_owned") || "{}") || {}; } catch { return {}; } })(),
+  tokens: (() => { try { return JSON.parse(localStorage.getItem("bn_tokens") || "{}") || {}; } catch { return {}; } })(),
+  lastSpin: _num("bn_lastSpin", 0),
   endgameUnlocked: localStorage.getItem("bn_endgame") === "true",
-  achievements: JSON.parse(localStorage.getItem("bn_achievements") || '{"wheel_spins":0,"games_won":0,"mysticals_pulled":0}'),
+  achievements: _achievements(),
   filterRarity: "all",
   filterPack: "all"
 };
@@ -2091,6 +2106,7 @@ Modes.incubator = {
       <div class="inc-buddy-picker" id="incPicker">
         <div class="inc-picker-inner">
           <h3>Select a Buddy</h3>
+          <div class="ip-filter-row" id="incPickerFilter"></div>
           <div id="incPickerGrid" class="inc-picker-grid"></div>
         </div>
       </div>
@@ -2098,6 +2114,7 @@ Modes.incubator = {
     const pods = Array(6).fill(null);
     const rates = { common:1, uncommon:2, rare:5, epic:12, legendary:30, chroma:60, mystical:100, secret:200 };
     let activeSlot = null;
+    let pickerFilter = "all";
 
     function renderPods() {
       const grid = $("incGrid");
@@ -2118,18 +2135,30 @@ Modes.incubator = {
       // Don't count the active slot — it's about to be replaced
       return pods.filter((p, i) => p && p.id === buddyId && i !== activeSlot).length;
     }
-    function showPicker() {
+    function renderPickerFilters() {
+      const owned = BUDDIES.filter(b => ownedCount(b.id) > 0);
+      const usedRarities = RARITY_ORDER.filter(r => owned.some(b => b.rarity === r));
+      const wrap = $("incPickerFilter");
+      wrap.innerHTML = "";
+      const opts = [["all", "All"], ...usedRarities.map(r => [r, RARITIES[r].name])];
+      opts.forEach(([key, label]) => {
+        const btn = document.createElement("button");
+        btn.className = "ip-filter-btn" + (pickerFilter === key ? " active" : "") + (key !== "all" ? " r-" + key : "");
+        btn.textContent = label;
+        btn.onclick = () => { pickerFilter = key; renderPickerFilters(); renderPickerGrid(); };
+        wrap.appendChild(btn);
+      });
+    }
+
+    function renderPickerGrid() {
       const picker = $("incPickerGrid");
       picker.innerHTML = "";
       const owned = BUDDIES.filter(b => ownedCount(b.id) > 0);
       if (owned.length === 0) {
         picker.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--dim)">No buddies yet. Open a pack first!</div>`;
-        $("incPicker").classList.add("show");
         return;
       }
-
-      // Group by rarity, render highest-rate first
-      const tiers = RARITY_ORDER.slice().reverse();   // mystical/secret first, common last
+      const tiers = (pickerFilter === "all" ? RARITY_ORDER.slice().reverse() : [pickerFilter]);
       tiers.forEach(rar => {
         const inTier = owned.filter(b => b.rarity === rar);
         if (inTier.length === 0) return;
@@ -2161,6 +2190,11 @@ Modes.incubator = {
           picker.appendChild(card);
         });
       });
+    }
+
+    function showPicker() {
+      renderPickerFilters();
+      renderPickerGrid();
       $("incPicker").classList.add("show");
     }
     $("incPicker").onclick = (e) => {
