@@ -1348,6 +1348,7 @@ function sellOne() {
   updateWallet();
   renderShop();
   renderDex();
+  maybeUnlockSecrets();
   if ((State.owned[id] || 0) <= 0) {
     $("buddyDetail").classList.remove("show");
   } else {
@@ -1369,6 +1370,7 @@ function sellAllExceptOne() {
   updateWallet();
   renderShop();
   renderDex();
+  maybeUnlockSecrets();
   showBuddyDetail(currentDetailBuddy);
 }
 
@@ -1402,6 +1404,7 @@ function sellAllDuplicates() {
   updateWallet();
   renderShop();
   renderDex();
+  maybeUnlockSecrets();
 }
 
 function updateSellAllBtn() {
