@@ -2372,6 +2372,8 @@ function setupGameNav() {
 Object.keys(State.owned).forEach(id => {
   if ((State.owned[id] || 0) <= 0) delete State.owned[id];
 });
+// Catch users who already have all base buddies from before the endgame system
+checkEndgameUnlock();
 save();
 
 setupNav();
