@@ -1080,7 +1080,14 @@ function renderDex() {
   if (visible.length === 0) {
     grid.innerHTML = `<div class="empty-msg">No buddies match this filter.</div>`;
   } else {
-    visible.forEach(b => {
+    const isEndgame = b => {
+      const p = PACKS.find(pk => pk.id === b.packId);
+      return p && p.requiresAll;
+    };
+    const baseVis = visible.filter(b => !isEndgame(b));
+    const endgameVis = visible.filter(b => isEndgame(b));
+
+    function renderCard(b) {
       const count = ownedCount(b.id);
       const seen = discovered(b.id);
       const card = document.createElement("div");
@@ -1093,7 +1100,24 @@ function renderDex() {
       `;
       if (seen) card.onclick = () => showBuddyDetail(b);
       grid.appendChild(card);
-    });
+    }
+
+    if (baseVis.length > 0) {
+      const baseOwnedCount = baseVis.filter(b => discovered(b.id)).length;
+      const h = document.createElement("div");
+      h.className = "dex-section-header";
+      h.innerHTML = `📚 BASE BUDDIES <span class="dex-h-count">${baseOwnedCount}/${baseVis.length}</span>`;
+      grid.appendChild(h);
+      baseVis.forEach(renderCard);
+    }
+    if (endgameVis.length > 0) {
+      const endgameOwnedC = endgameVis.filter(b => discovered(b.id)).length;
+      const h = document.createElement("div");
+      h.className = "dex-section-header endgame-header";
+      h.innerHTML = `⭐ ENDGAME BUDDIES <span class="dex-h-count">${endgameOwnedC}/${endgameVis.length}</span>${State.endgameUnlocked ? "" : " <span class=\"dex-h-locked\">🔒 Locked</span>"}`;
+      grid.appendChild(h);
+      endgameVis.forEach(renderCard);
+    }
   }
   renderFilters();
   updateSellAllBtn();
