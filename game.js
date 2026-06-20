@@ -2096,7 +2096,7 @@ Modes.incubator = {
       </div>
     `;
     const pods = Array(6).fill(null);
-    const rates = { common:1, uncommon:2, rare:5, epic:12, legendary:30, chroma:60, mystical:100 };
+    const rates = { common:1, uncommon:2, rare:5, epic:12, legendary:30, chroma:60, mystical:100, secret:200 };
     let activeSlot = null;
 
     function renderPods() {
@@ -2124,27 +2124,42 @@ Modes.incubator = {
       const owned = BUDDIES.filter(b => ownedCount(b.id) > 0);
       if (owned.length === 0) {
         picker.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--dim)">No buddies yet. Open a pack first!</div>`;
+        $("incPicker").classList.add("show");
+        return;
       }
-      owned.forEach(b => {
-        const own = ownedCount(b.id);
-        const placed = placedCount(b.id);
-        const available = own - placed;
-        const card = document.createElement("div");
-        card.className = "inc-picker-buddy" + (available <= 0 ? " ip-disabled" : "");
-        card.innerHTML = `
-          <div class="ip-emoji">${buddyFrame(b.emoji, b.rarity, "", b.effect, b.id)}</div>
-          <div class="ip-name">${b.name}</div>
-          <div style="font-size:10px;color:var(--accent)">+${rates[b.rarity]}/s</div>
-          <div style="font-size:9px;color:${available > 0 ? 'var(--accent2)' : 'var(--red)'}">${available}/${own} free</div>
-        `;
-        if (available > 0) {
-          card.onclick = () => {
-            pods[activeSlot] = b;
-            $("incPicker").classList.remove("show");
-            renderPods();
-          };
-        }
-        picker.appendChild(card);
+
+      // Group by rarity, render highest-rate first
+      const tiers = RARITY_ORDER.slice().reverse();   // mystical/secret first, common last
+      tiers.forEach(rar => {
+        const inTier = owned.filter(b => b.rarity === rar);
+        if (inTier.length === 0) return;
+        inTier.sort((a, b) => a.name.localeCompare(b.name));
+
+        const header = document.createElement("div");
+        header.className = "ip-section-header";
+        header.innerHTML = `<span class="r-${rar}">${RARITIES[rar].name}</span> <span class="ip-rate-tag">+${rates[rar]}/s</span>`;
+        picker.appendChild(header);
+
+        inTier.forEach(b => {
+          const own = ownedCount(b.id);
+          const placed = placedCount(b.id);
+          const available = own - placed;
+          const card = document.createElement("div");
+          card.className = "inc-picker-buddy" + (available <= 0 ? " ip-disabled" : "");
+          card.innerHTML = `
+            <div class="ip-emoji">${buddyFrame(b.emoji, b.rarity, "", b.effect, b.id)}</div>
+            <div class="ip-name">${b.name}</div>
+            <div style="font-size:9px;color:${available > 0 ? 'var(--accent2)' : 'var(--red)'}">${available}/${own} free</div>
+          `;
+          if (available > 0) {
+            card.onclick = () => {
+              pods[activeSlot] = b;
+              $("incPicker").classList.remove("show");
+              renderPods();
+            };
+          }
+          picker.appendChild(card);
+        });
       });
       $("incPicker").classList.add("show");
     }

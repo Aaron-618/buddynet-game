@@ -422,6 +422,21 @@ body {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   gap: 8px;
 }
+.ip-section-header {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; margin-top: 6px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  font-weight: 800; letter-spacing: 1px; font-size: 12px;
+  border-left: 3px solid var(--accent);
+}
+.ip-section-header > span:first-child {
+  padding: 3px 10px; border-radius: 8px; font-size: 11px;
+}
+.ip-rate-tag {
+  color: var(--accent); font-weight: 800;
+}
 .inc-picker-buddy {
   background: var(--card2); padding: 10px; border-radius: 10px;
   text-align: center; cursor: pointer; transition: 0.15s;
