@@ -131,7 +131,7 @@ const PACKS = [
         { name: "Blue Flare", emoji: "💙" }
       ]},
       { rarity: "mystical", weight: 0.01, buddies: [
-        { name: "Rainbow Charmander", emoji: "🦎", sell: 100000, effect: "rainbow" }
+        { name: "Rainbow Charmander", emoji: "🦎", sell: 100000 }
       ]}
     ]
   },

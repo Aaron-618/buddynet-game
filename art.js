@@ -6,6 +6,90 @@
 
 const CUSTOM_SVG = {};
 
+// ---------- RAINBOW CHARMANDER (Elemental Mystical) — custom Blooket-style art ----------
+CUSTOM_SVG.elemental_rainbow_charmander = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="rcBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#FF1F4E"/>
+      <stop offset="0.2" stop-color="#FF8C00"/>
+      <stop offset="0.4" stop-color="#FFD93D"/>
+      <stop offset="0.6" stop-color="#4ADE80"/>
+      <stop offset="0.8" stop-color="#38BDF8"/>
+      <stop offset="1"   stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="rcFlame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0"   stop-color="#A855F7"/>
+      <stop offset="0.3" stop-color="#38BDF8"/>
+      <stop offset="0.5" stop-color="#4ADE80"/>
+      <stop offset="0.75" stop-color="#FFD93D"/>
+      <stop offset="1"   stop-color="#FF1F4E"/>
+    </linearGradient>
+    <radialGradient id="rcGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="rgba(255,255,255,0.4)"/>
+      <stop offset="1" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Rainbow flame (behind body, upper right) -->
+  <path d="M82 38 Q72 28 78 14 Q83 22 86 18 Q86 8 92 4 Q90 14 94 18 Q98 22 95 32 Q90 40 82 38 Z"
+        fill="url(#rcFlame)"/>
+  <!-- Inner flame highlight -->
+  <path d="M85 32 Q82 24 86 16 Q88 22 90 18 Q88 26 92 28 Q90 34 85 32 Z"
+        fill="rgba(255,255,255,0.35)"/>
+  <!-- Flame sparkles -->
+  <circle cx="78" cy="6"  r="1.2" fill="#FFD93D"/>
+  <circle cx="96" cy="14" r="1"   fill="#FFD93D"/>
+  <circle cx="95" cy="34" r="1.2" fill="#FF1F4E"/>
+  <circle cx="74" cy="20" r="0.8" fill="#FFD93D"/>
+  <circle cx="98" cy="42" r="1"   fill="#A855F7"/>
+
+  <!-- Rounded square body -->
+  <rect x="18" y="26" width="62" height="60" rx="15" fill="url(#rcBody)" stroke="#1A1A2E" stroke-width="1.4"/>
+  <!-- Subtle top highlight to give 3D feel -->
+  <rect x="22" y="29" width="54" height="14" rx="8" fill="url(#rcGlow)"/>
+
+  <!-- Yellow belly -->
+  <ellipse cx="49" cy="74" rx="20" ry="11" fill="#FFE082"/>
+
+  <!-- Feet -->
+  <rect x="22" y="80" width="12" height="9" rx="4.5" fill="#fff" stroke="#1A1A2E" stroke-width="1"/>
+  <rect x="64" y="80" width="12" height="9" rx="4.5" fill="#fff" stroke="#1A1A2E" stroke-width="1"/>
+  <!-- Toe lines -->
+  <line x1="26" y1="83" x2="26" y2="89" stroke="#1A1A2E" stroke-width="0.6"/>
+  <line x1="30" y1="83" x2="30" y2="89" stroke="#1A1A2E" stroke-width="0.6"/>
+  <line x1="68" y1="83" x2="68" y2="89" stroke="#1A1A2E" stroke-width="0.6"/>
+  <line x1="72" y1="83" x2="72" y2="89" stroke="#1A1A2E" stroke-width="0.6"/>
+
+  <!-- Big eyes (whites) -->
+  <ellipse cx="33" cy="46" rx="7.5" ry="9" fill="#fff" stroke="#1A1A2E" stroke-width="1.4"/>
+  <ellipse cx="63" cy="46" rx="7.5" ry="9" fill="#fff" stroke="#1A1A2E" stroke-width="1.4"/>
+  <!-- Iris (teal-blue) -->
+  <ellipse cx="33" cy="48" rx="4.5" ry="5.5" fill="#1B4965"/>
+  <ellipse cx="63" cy="48" rx="4.5" ry="5.5" fill="#1B4965"/>
+  <!-- Pupil -->
+  <circle cx="33" cy="49" r="2.4" fill="#0A1722"/>
+  <circle cx="63" cy="49" r="2.4" fill="#0A1722"/>
+  <!-- Eye shine -->
+  <circle cx="34.5" cy="45" r="1.6" fill="#fff"/>
+  <circle cx="64.5" cy="45" r="1.6" fill="#fff"/>
+
+  <!-- Brow ridges (smile lines above eyes) -->
+  <path d="M27 38 Q31 35 40 39" stroke="#1A1A2E" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="M56 39 Q65 35 69 38" stroke="#1A1A2E" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+
+  <!-- Nostrils -->
+  <ellipse cx="44" cy="60" rx="0.7" ry="1" fill="#1A1A2E"/>
+  <ellipse cx="52" cy="60" rx="0.7" ry="1" fill="#1A1A2E"/>
+
+  <!-- Smile (open mouth) -->
+  <path d="M37 65 Q48 76 59 65 Q59 73 48 74 Q37 73 37 65 Z" fill="#1A1A2E" stroke="#1A1A2E" stroke-width="1"/>
+  <!-- Pink tongue -->
+  <path d="M40 68 Q48 73 56 68 Q56 73 48 74 Q40 73 40 68 Z" fill="#E91E63"/>
+  <!-- Teeth -->
+  <path d="M41 65 L42 69 L44 65 Z" fill="#fff"/>
+  <path d="M52 65 L54 69 L55 65 Z" fill="#fff"/>
+</svg>`;
+
 // ---------- PHOENIX (Medieval Epic) ----------
 CUSTOM_SVG.medieval_phoenix = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
