@@ -90,45 +90,7 @@ CUSTOM_SVG.elemental_rainbow_charmander = `<svg viewBox="0 0 100 100" xmlns="htt
   <path d="M52 65 L54 69 L55 65 Z" fill="#fff"/>
 </svg>`;
 
-// ---------- PHOENIX (Medieval Epic) ----------
-CUSTOM_SVG.medieval_phoenix = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="phB" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0" stop-color="#FFE94E"/><stop offset="1" stop-color="#FF3000"/>
-    </linearGradient>
-  </defs>
-  <path d="M50 58 Q22 88 30 99 L50 84 L70 99 Q78 88 50 58Z" fill="#A50027"/>
-  <path d="M50 62 Q36 80 50 92 Q64 80 50 62Z" fill="#FF5C0A"/>
-  <ellipse cx="50" cy="50" rx="22" ry="25" fill="url(#phB)"/>
-  <path d="M28 44 Q4 32 8 58 Q22 50 30 49Z" fill="#FF3000"/>
-  <path d="M72 44 Q96 32 92 58 Q78 50 70 49Z" fill="#FF3000"/>
-  <circle cx="50" cy="27" r="13" fill="url(#phB)"/>
-  <polygon points="44,25 56,25 50,14" fill="#FF9800"/>
-  <circle cx="46" cy="26" r="3" fill="white"/>
-  <circle cx="46.5" cy="26.5" r="1.5" fill="#1a1a2e"/>
-  <path d="M50 14 Q44 6 50 0 Q56 6 50 14" fill="#FFE94E"/>
-  <path d="M50 14 Q48 8 53 4 Q54 9 50 14" fill="#FF6B35"/>
-</svg>`;
-
-// ---------- THE PHOENIX OVERLORD (Starter Mystical) ----------
-CUSTOM_SVG.starter_the_phoenix_overlord = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="poB" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0" stop-color="#FFF59A"/><stop offset="1" stop-color="#FF1500"/>
-    </linearGradient>
-  </defs>
-  <path d="M50 58 Q18 92 28 100 L50 84 L72 100 Q82 92 50 58Z" fill="#7A0019"/>
-  <path d="M50 62 Q32 84 50 96 Q68 84 50 62Z" fill="#FF4500"/>
-  <ellipse cx="50" cy="50" rx="25" ry="28" fill="url(#poB)"/>
-  <path d="M25 42 Q0 26 4 60 Q20 50 27 48Z" fill="#FF2500"/>
-  <path d="M75 42 Q100 26 96 60 Q80 50 73 48Z" fill="#FF2500"/>
-  <circle cx="50" cy="27" r="14" fill="url(#poB)"/>
-  <polygon points="44,25 56,25 50,12" fill="#FFAA00"/>
-  <circle cx="46" cy="25" r="3" fill="white"/>
-  <circle cx="46.5" cy="25.5" r="1.5" fill="#1a1a2e"/>
-  <polygon points="38,12 44,2 50,8 56,2 62,12" fill="#FFD700" stroke="#B8860B" stroke-width="1.2"/>
-  <circle cx="50" cy="6" r="2.5" fill="#FF1500"/>
-</svg>`;
+// (Phoenix and Phoenix Overlord intentionally use the default emoji rendering — no custom SVG.)
 
 // ---------- CYBER DOG (Cyber Rare) ----------
 CUSTOM_SVG.cyber_cyber_dog = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
