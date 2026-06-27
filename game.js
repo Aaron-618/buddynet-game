@@ -2177,6 +2177,33 @@ Modes.clash = {
 // ====== 4. INCUBATOR ======
 Modes.incubator = {
   start(canvas) {
+    // Step 1: duration picker
+    canvas.innerHTML = `
+      <div class="inc-dur-card">
+        <h2>🏢 The Incubator</h2>
+        <p>Choose how long to run the hatching pods.</p>
+        <div class="inc-dur-display"><span id="incDurVal">45</span><small>seconds</small></div>
+        <input type="range" min="1" max="60" value="45" id="incDurSlider" class="inc-dur-slider">
+        <div class="inc-dur-row">
+          <button class="dur-quick" data-d="1">1s</button>
+          <button class="dur-quick" data-d="10">10s</button>
+          <button class="dur-quick" data-d="30">30s</button>
+          <button class="dur-quick" data-d="45">45s</button>
+          <button class="dur-quick" data-d="60">60s</button>
+        </div>
+        <button class="big-btn" id="incStartBtn">Start Incubator</button>
+      </div>
+    `;
+    const slider = $("incDurSlider");
+    const val = $("incDurVal");
+    slider.oninput = (e) => { val.textContent = e.target.value; };
+    document.querySelectorAll(".dur-quick").forEach(b => {
+      b.onclick = () => { slider.value = b.dataset.d; val.textContent = b.dataset.d; };
+    });
+    const self = this;
+    $("incStartBtn").onclick = () => self._begin(canvas, parseInt(slider.value));
+  },
+  _begin(canvas, duration) {
     canvas.innerHTML = `
       <div style="text-align:center;color:var(--dim);margin-bottom:10px">
         Place buddies in pods. Each rarity earns different rates per second.
@@ -2289,12 +2316,12 @@ Modes.incubator = {
       updateGameHUD();
     };
 
-    gameTimer(45, () => {
+    gameTimer(duration, () => {
       endGame({
         win: GameRunner.coins > 0,
         coins: GameRunner.coins,
         title: "🏢 Hatching Complete!",
-        stats: `Rate: ${GameRunner.score}/s · Pods filled: ${pods.filter(Boolean).length}/6`
+        stats: `Duration: ${duration}s · Rate: ${GameRunner.score}/s · Pods filled: ${pods.filter(Boolean).length}/6`
       });
     });
   }
