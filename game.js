@@ -2182,23 +2182,34 @@ Modes.incubator = {
       <div class="inc-dur-card">
         <h2>🏢 The Incubator</h2>
         <p>Choose how long to run the hatching pods.</p>
-        <div class="inc-dur-display"><span id="incDurVal">45</span><small>seconds</small></div>
-        <input type="range" min="1" max="60" value="45" id="incDurSlider" class="inc-dur-slider">
+        <div class="inc-dur-display"><span id="incDurVal">45</span><small id="incDurUnit">seconds</small></div>
+        <input type="range" min="1" max="300" value="45" id="incDurSlider" class="inc-dur-slider">
         <div class="inc-dur-row">
           <button class="dur-quick" data-d="1">1s</button>
-          <button class="dur-quick" data-d="10">10s</button>
           <button class="dur-quick" data-d="30">30s</button>
-          <button class="dur-quick" data-d="45">45s</button>
-          <button class="dur-quick" data-d="60">60s</button>
+          <button class="dur-quick" data-d="60">1m</button>
+          <button class="dur-quick" data-d="120">2m</button>
+          <button class="dur-quick" data-d="300">5m</button>
         </div>
         <button class="big-btn" id="incStartBtn">Start Incubator</button>
       </div>
     `;
+    function fmt(sec) {
+      if (sec < 60) return { num: sec, unit: sec === 1 ? "second" : "seconds" };
+      const m = Math.floor(sec / 60), s = sec % 60;
+      return { num: s ? `${m}:${String(s).padStart(2,"0")}` : m, unit: s ? "minutes" : (m === 1 ? "minute" : "minutes") };
+    }
     const slider = $("incDurSlider");
     const val = $("incDurVal");
-    slider.oninput = (e) => { val.textContent = e.target.value; };
+    const unit = $("incDurUnit");
+    function update(sec) {
+      const f = fmt(parseInt(sec));
+      val.textContent = f.num;
+      unit.textContent = f.unit;
+    }
+    slider.oninput = (e) => update(e.target.value);
     document.querySelectorAll(".dur-quick").forEach(b => {
-      b.onclick = () => { slider.value = b.dataset.d; val.textContent = b.dataset.d; };
+      b.onclick = () => { slider.value = b.dataset.d; update(b.dataset.d); };
     });
     const self = this;
     $("incStartBtn").onclick = () => self._begin(canvas, parseInt(slider.value));
