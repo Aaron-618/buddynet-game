@@ -44,7 +44,7 @@ const SECRET_BUDDIES = [
     hint: "Have 100,000 coins at once."
   },
   {
-    id: "secret_collector_supreme", name: "Collector Supreme", emoji: "👑",
+    id: "secret_collector_supreme", name: "Collector Supreme", emoji: "🏆",
     rarity: "secret", sell: 50000, pack: "Secret Achievement", packId: "secret",
     unlock: { type: "all_base", target: 1 },
     hint: "Collect all 80 base buddies."
@@ -206,7 +206,7 @@ const PACKS = [
         { name: "Triceratops", emoji: "🦏" },
         { name: "Stegosaurus", emoji: "🦕" },
         { name: "Raptor", emoji: "🦖" },
-        { name: "Pterodactyl", emoji: "🦅" }
+        { name: "Pterodactyl", emoji: "🪽" }
       ]},
       { rarity: "rare", weight: 30, buddies: [
         { name: "Brachiosaurus", emoji: "🦕" },
@@ -275,7 +275,7 @@ const PACKS = [
         { name: "Elf", emoji: "🧝" }
       ]},
       { rarity: "epic", weight: 16.5, buddies: [
-        { name: "Griffin", emoji: "🦅" },
+        { name: "Griffin", emoji: "🦁" },
         { name: "Phoenix", emoji: "🐦‍🔥" }
       ]},
       { rarity: "legendary", weight: 0.46, buddies: [
@@ -443,7 +443,7 @@ const PACKS = [
         { name: "The Shadow Lord", emoji: "👹" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
-        { name: "Phantom Strike", emoji: "⚡", effect: "rainbow" }
+        { name: "Phantom Strike", emoji: "👤", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "The Ghost Emperor", emoji: "👻", sell: 10000 }
@@ -458,7 +458,7 @@ const PACKS = [
     drops: [
       { rarity: "uncommon", weight: 50, buddies: [
         { name: "Faun", emoji: "🐐" },
-        { name: "Centaur", emoji: "🏹" },
+        { name: "Centaur", emoji: "🐎" },
         { name: "Pixie", emoji: "🧚" },
         { name: "Imp", emoji: "😈" }
       ]},
@@ -472,7 +472,7 @@ const PACKS = [
         { name: "Medusa", emoji: "🐍" }
       ]},
       { rarity: "legendary", weight: 0.5, buddies: [
-        { name: "The Titan", emoji: "🗿" }
+        { name: "The Titan", emoji: "🦣" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
         { name: "Pegasus Knight", emoji: "🦄", effect: "rainbow" }
@@ -491,7 +491,7 @@ const PACKS = [
       { rarity: "uncommon", weight: 50, buddies: [
         { name: "Demon Imp", emoji: "👿" },
         { name: "Shade", emoji: "👤" },
-        { name: "Hellhound", emoji: "🐺" },
+        { name: "Hellhound", emoji: "🐕" },
         { name: "Cursed Skull", emoji: "💀" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
@@ -523,7 +523,7 @@ const PACKS = [
       { rarity: "uncommon", weight: 50, buddies: [
         { name: "Snowball", emoji: "⚪" },
         { name: "Ice Shard", emoji: "🧊" },
-        { name: "Frost Fairy", emoji: "✨" },
+        { name: "Frost Fairy", emoji: "🧚‍♀️" },
         { name: "Polar Pup", emoji: "🐻‍❄️" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
@@ -603,7 +603,7 @@ const PACKS = [
         { name: "The Diamond Lord", emoji: "💎" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
-        { name: "Prism Geode", emoji: "🔮", effect: "rainbow" }
+        { name: "Prism Geode", emoji: "💠", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "Crystal Overlord", emoji: "💠", sell: 10000 }
@@ -632,7 +632,7 @@ const PACKS = [
         { name: "Storm Caller", emoji: "⛈️" }
       ]},
       { rarity: "legendary", weight: 0.5, buddies: [
-        { name: "The Storm King", emoji: "👑" }
+        { name: "The Storm King", emoji: "⛈️" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
         { name: "Rainbow Tempest", emoji: "🌈", effect: "rainbow" }
@@ -652,11 +652,11 @@ const PACKS = [
         { name: "Wyrmling", emoji: "🐍" },
         { name: "Drake", emoji: "🦎" },
         { name: "Hatchling", emoji: "🥚" },
-        { name: "Wyvern", emoji: "🦅" }
+        { name: "Wyvern", emoji: "🐲" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
         { name: "Frost Wyrm", emoji: "🐲" },
-        { name: "Sea Serpent", emoji: "🐉" },
+        { name: "Sea Serpent", emoji: "🐍" },
         { name: "Wind Drake", emoji: "🌬️" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
@@ -692,8 +692,8 @@ const PACKS = [
         { name: "Skeleton Warrior", emoji: "⚔️" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
-        { name: "Lich King", emoji: "🧙" },
-        { name: "Bone Dragon", emoji: "🐉" }
+        { name: "Lich King", emoji: "☠️" },
+        { name: "Bone Dragon", emoji: "🦴" }
       ]},
       { rarity: "legendary", weight: 0.5, buddies: [
         { name: "The Reaper", emoji: "💀" }

@@ -29,7 +29,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Big Top", emoji: "🎪", effect: "rainbow" },
-        { name: "Glow Stick Trail", emoji: "✨", effect: "rainbow" }
+        { name: "Glow Stick Trail", emoji: "💫", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "The Phantom Jester", emoji: "🃏", sell: 25000 }
@@ -53,11 +53,11 @@ const TIER3_PACKS = [
         { name: "Tulip Field", emoji: "🌷" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
-        { name: "Garden Gnome", emoji: "🧙" }, { name: "Flower Fairy", emoji: "🧚" },
+        { name: "Garden Gnome", emoji: "🧝" }, { name: "Flower Fairy", emoji: "🧚" },
         { name: "Hedgehog", emoji: "🦔" }, { name: "Mantis Knight", emoji: "🦗" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
-        { name: "The Queen Bee", emoji: "👑" }, { name: "Forest Sprite", emoji: "🍃" }
+        { name: "The Queen Bee", emoji: "🐝" }, { name: "Forest Sprite", emoji: "🍃" }
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Petals", emoji: "🌈", effect: "rainbow" },
@@ -96,7 +96,7 @@ const TIER3_PACKS = [
         { name: "Sunset Mirage", emoji: "🌅", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
-        { name: "The Island King", emoji: "👑", sell: 25000 }
+        { name: "The Island King", emoji: "🌴", sell: 25000 }
       ]}
     ]
   },
@@ -117,7 +117,7 @@ const TIER3_PACKS = [
         { name: "Alchemist Robe", emoji: "🥼" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
-        { name: "Master Alchemist", emoji: "🧙‍♂️" }, { name: "Philosopher Stone", emoji: "💎" },
+        { name: "Master Alchemist", emoji: "🧙‍♂️" }, { name: "Philosopher Stone", emoji: "🪨" },
         { name: "Elixir of Life", emoji: "💊" }, { name: "Liquid Gold", emoji: "🟡" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
@@ -150,14 +150,14 @@ const TIER3_PACKS = [
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
         { name: "Black Swan", emoji: "🦢" }, { name: "Masked Duke", emoji: "🎭" },
-        { name: "White Knight", emoji: "🤍" }, { name: "Opera Phantom", emoji: "👻" }
+        { name: "White Knight", emoji: "🤍" }, { name: "Opera Phantom", emoji: "🎭" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
         { name: "The Veiled Empress", emoji: "👸" }, { name: "The Phantom Lord", emoji: "🎭" }
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Mask", emoji: "🎭", effect: "rainbow" },
-        { name: "Velvet Cloak", emoji: "✨", effect: "rainbow" }
+        { name: "Velvet Cloak", emoji: "🧥", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "The Forgotten Aristocrat", emoji: "👤", sell: 25000 }
@@ -173,23 +173,23 @@ const TIER3_PACKS = [
       { rarity: "uncommon", weight: 50, buddies: [
         { name: "Olive Branch", emoji: "🌿" }, { name: "Lyre", emoji: "🎵" },
         { name: "White Toga", emoji: "👕" }, { name: "Laurel Wreath", emoji: "🌹" },
-        { name: "Marble Bust", emoji: "🗿" }, { name: "Golden Chariot", emoji: "🛺" }
+        { name: "Marble Bust", emoji: "🏛️" }, { name: "Golden Chariot", emoji: "🛺" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
-        { name: "Pegasus", emoji: "🐴" }, { name: "Centaur Sentinel", emoji: "🏹" },
+        { name: "Pegasus", emoji: "🐴" }, { name: "Centaur Sentinel", emoji: "🐴" },
         { name: "Naiad", emoji: "🧜‍♀️" }, { name: "Satyr", emoji: "🐐" },
         { name: "Delphi Oracle", emoji: "🔮" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
         { name: "Athena", emoji: "🦉" }, { name: "Apollo", emoji: "☀️" },
-        { name: "Artemis", emoji: "🏹" }, { name: "Hermes", emoji: "👟" }
+        { name: "Artemis", emoji: "🌙" }, { name: "Hermes", emoji: "👟" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
-        { name: "Zeus", emoji: "⚡" }, { name: "Poseidon", emoji: "🔱" }
+        { name: "Zeus", emoji: "🌩️" }, { name: "Poseidon", emoji: "🔱" }
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Olympus Aurora", emoji: "🌈", effect: "rainbow" },
-        { name: "Divine Glow", emoji: "✨", effect: "rainbow" }
+        { name: "Divine Glow", emoji: "☀️", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "Chronos", emoji: "⏳", sell: 25000 }
@@ -224,7 +224,7 @@ const TIER3_PACKS = [
         { name: "Spectral Hound", emoji: "🐕", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
-        { name: "The Eternal Hunter", emoji: "🏹", sell: 25000 }
+        { name: "The Eternal Hunter", emoji: "🎯", sell: 25000 }
       ]}
     ]
   },
@@ -273,7 +273,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "rare", weight: 33, buddies: [
         { name: "Pixel Hero", emoji: "🎮" }, { name: "Pixel Princess", emoji: "👸" },
-        { name: "Boss Knight", emoji: "⚔️" }, { name: "Pixel Dragon", emoji: "🐉" },
+        { name: "Boss Knight", emoji: "⚔️" }, { name: "Pixel Dragon", emoji: "🎮" },
         { name: "Power Star", emoji: "⭐" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
@@ -285,7 +285,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Cartridge", emoji: "💾", effect: "rainbow" },
-        { name: "Glitching Hero", emoji: "✨", effect: "rainbow" }
+        { name: "Glitching Hero", emoji: "👾", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "The Game Architect", emoji: "👨‍💻", sell: 25000 }
@@ -304,13 +304,13 @@ const TIER3_PACKS = [
         { name: "Beret", emoji: "👒" }, { name: "Charcoal", emoji: "⚫" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
-        { name: "Sculptor", emoji: "🗿" }, { name: "Portrait", emoji: "🖼️" },
+        { name: "Sculptor", emoji: "👨‍🎨" }, { name: "Portrait", emoji: "🖼️" },
         { name: "Watercolor", emoji: "💧" }, { name: "Pastel Stick", emoji: "🖍️" },
         { name: "Sketchbook", emoji: "📔" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
         { name: "Renaissance Master", emoji: "👨‍🎨" }, { name: "Modern Artist", emoji: "🖌️" },
-        { name: "Sculptor's Muse", emoji: "🗿" }, { name: "Mural Painter", emoji: "🎨" }
+        { name: "Sculptor's Muse", emoji: "💃" }, { name: "Mural Painter", emoji: "🎨" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
         { name: "The Mona Lisa", emoji: "🖼️" }, { name: "Sculptor God", emoji: "🗿" }
@@ -332,8 +332,8 @@ const TIER3_PACKS = [
     drops: [
       { rarity: "uncommon", weight: 50, buddies: [
         { name: "Battery Cell", emoji: "🔋" }, { name: "Power Plug", emoji: "🔌" },
-        { name: "Live Wire", emoji: "⚡" }, { name: "Switch", emoji: "🎛️" },
-        { name: "Lightbulb", emoji: "💡" }, { name: "Static Spark", emoji: "✨" }
+        { name: "Live Wire", emoji: "🔌" }, { name: "Switch", emoji: "🎛️" },
+        { name: "Lightbulb", emoji: "💡" }, { name: "Static Spark", emoji: "🔋" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
         { name: "Generator", emoji: "⚙️" }, { name: "Tesla Coil", emoji: "⚡" },
@@ -341,14 +341,14 @@ const TIER3_PACKS = [
         { name: "Volt Meter", emoji: "📊" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
-        { name: "Lightning Bolt", emoji: "⚡" }, { name: "Plasma Orb", emoji: "🔮" },
+        { name: "Lightning Bolt", emoji: "⚡" }, { name: "Plasma Orb", emoji: "🟣" },
         { name: "Electric Eel", emoji: "🐍" }, { name: "Storm Cell", emoji: "⛈️" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
-        { name: "The Voltage King", emoji: "👑" }, { name: "Storm Conductor", emoji: "⛈️" }
+        { name: "The Voltage King", emoji: "💡" }, { name: "Storm Conductor", emoji: "⛈️" }
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
-        { name: "Prism Plasma", emoji: "🔮", effect: "rainbow" },
+        { name: "Prism Plasma", emoji: "🟪", effect: "rainbow" },
         { name: "Aurora Bolt", emoji: "🌌", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
@@ -363,7 +363,7 @@ const TIER3_PACKS = [
     requiresAll: true, tier3: true,
     drops: [
       { rarity: "uncommon", weight: 50, buddies: [
-        { name: "Tarot Card", emoji: "🎴" }, { name: "Quartz Shard", emoji: "💎" },
+        { name: "Tarot Card", emoji: "🎴" }, { name: "Quartz Shard", emoji: "🔷" },
         { name: "Pendulum", emoji: "⚖️" }, { name: "Incense", emoji: "🕯️" },
         { name: "Tea Leaves", emoji: "🍵" }, { name: "Runestone", emoji: "🪨" }
       ]},
@@ -381,7 +381,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Vision", emoji: "🌈", effect: "rainbow" },
-        { name: "Aura Sphere", emoji: "🔮", effect: "rainbow" }
+        { name: "Aura Sphere", emoji: "🌐", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "The Eternal Oracle", emoji: "👁️", sell: 25000 }
@@ -406,7 +406,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
         { name: "Lunar Wolf", emoji: "🐺" }, { name: "Moonstone Bear", emoji: "🐻" },
-        { name: "Vampire Lord", emoji: "🧛" }, { name: "Banshee", emoji: "👻" }
+        { name: "Vampire Lord", emoji: "🧛" }, { name: "Banshee", emoji: "🦇" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
         { name: "The Moon Queen", emoji: "👸" }, { name: "Night Guardian", emoji: "🌃" }
@@ -445,7 +445,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Brass Aurora", emoji: "⚙️", effect: "rainbow" },
-        { name: "Steam Prism", emoji: "✨", effect: "rainbow" }
+        { name: "Steam Prism", emoji: "⚙️", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "The Clockwork Emperor", emoji: "⌛", sell: 25000 }
@@ -465,7 +465,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "rare", weight: 33, buddies: [
         { name: "Karate Master", emoji: "🥋" }, { name: "Judo Throw", emoji: "🤼" },
-        { name: "Kung Fu Stance", emoji: "🥋" }, { name: "Sensei", emoji: "🧓" },
+        { name: "Kung Fu Stance", emoji: "🤼" }, { name: "Sensei", emoji: "🧓" },
         { name: "Monk Apprentice", emoji: "🧘" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
@@ -473,7 +473,7 @@ const TIER3_PACKS = [
         { name: "Crane Style", emoji: "🦢" }, { name: "Snake Style", emoji: "🐍" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
-        { name: "The Grand Master", emoji: "🥋" }, { name: "Shaolin Monk", emoji: "🧘‍♂️" }
+        { name: "The Grand Master", emoji: "🧔‍♂️" }, { name: "Shaolin Monk", emoji: "🧘‍♂️" }
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Strike", emoji: "🌈", effect: "rainbow" },
@@ -497,12 +497,12 @@ const TIER3_PACKS = [
       ]},
       { rarity: "rare", weight: 33, buddies: [
         { name: "Salmon Fillet", emoji: "🐟" }, { name: "Tuna Slice", emoji: "🐟" },
-        { name: "Eel Roll", emoji: "✨" }, { name: "Rice Bowl", emoji: "🍚" },
+        { name: "Eel Roll", emoji: "🍣" }, { name: "Rice Bowl", emoji: "🍚" },
         { name: "Sake", emoji: "🍶" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
         { name: "Master Chef", emoji: "👨‍🍳" }, { name: "Octopus Special", emoji: "🐙" },
-        { name: "Dragon Roll", emoji: "🐉" }, { name: "Sashimi Plate", emoji: "🍱" }
+        { name: "Dragon Roll", emoji: "🍣" }, { name: "Sashimi Plate", emoji: "🍱" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
         { name: "The Sushi Sensei", emoji: "👨‍🍳" }, { name: "Golden Salmon", emoji: "🐟" }
@@ -541,7 +541,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Melody", emoji: "🌈", effect: "rainbow" },
-        { name: "Aurora Symphony", emoji: "✨", effect: "rainbow" }
+        { name: "Aurora Symphony", emoji: "🎼", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "The Eternal Composer", emoji: "🎶", sell: 25000 }
@@ -569,7 +569,7 @@ const TIER3_PACKS = [
         { name: "Rosé Spring", emoji: "🌸" }, { name: "Champagne", emoji: "🥂" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
-        { name: "The Vintage Lord", emoji: "🍷" }, { name: "Sommelier King", emoji: "👑" }
+        { name: "The Vintage Lord", emoji: "🍷" }, { name: "Sommelier King", emoji: "🥂" }
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Vintage", emoji: "🌈", effect: "rainbow" },
@@ -637,7 +637,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "chroma", weight: 0.2, buddies: [
         { name: "Rainbow Drift", emoji: "💨", effect: "rainbow" },
-        { name: "Lightning Lap", emoji: "⚡", effect: "rainbow" }
+        { name: "Lightning Lap", emoji: "🏁", effect: "rainbow" }
       ]},
       { rarity: "mystical", weight: 0.1, buddies: [
         { name: "The Eternal Racer", emoji: "🏁", sell: 25000 }
