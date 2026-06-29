@@ -708,6 +708,31 @@ const PACKS = [
   }
 ];
 
+// ---------- DIAMOND PACK (Gems only, always available) ----------
+PACKS.push({
+  id: "diamond", name: "Diamond Pack", emoji: "💎", price: 3, currency: "gems",
+  desc: "Premium pack — pay with gems for guaranteed Epic+ tier buddies.",
+  alwaysShow: true,
+  drops: [
+    { rarity: "epic", weight: 60, buddies: [
+      { name: "Diamond Pup", emoji: "🐶" },
+      { name: "Diamond Kitten", emoji: "🐱" },
+      { name: "Diamond Knight", emoji: "🛡️" },
+      { name: "Diamond Eagle", emoji: "🦅" }
+    ]},
+    { rarity: "legendary", weight: 30, buddies: [
+      { name: "Diamond Dragon", emoji: "🐉" },
+      { name: "Diamond Lord", emoji: "👑" }
+    ]},
+    { rarity: "chroma", weight: 8, buddies: [
+      { name: "Rainbow Diamond", emoji: "💎", effect: "rainbow" }
+    ]},
+    { rarity: "mystical", weight: 2, buddies: [
+      { name: "The Eternal Diamond", emoji: "💠", sell: 50000 }
+    ]}
+  ]
+});
+
 // Merge Tier 3 packs (loaded from tier3.js) into the master PACKS list
 if (typeof TIER3_PACKS !== "undefined") TIER3_PACKS.forEach(p => PACKS.push(p));
 
@@ -873,7 +898,7 @@ function ownedCount(id) { return State.owned[id] || 0; }
 function baseBuddies() {
   return BUDDIES.filter(b => {
     const p = PACKS.find(pk => pk.id === b.packId);
-    return p && !p.requiresAll;
+    return p && !p.requiresAll && !p.alwaysShow;
   });
 }
 function baseCollectedCount() {
@@ -949,6 +974,7 @@ function checkSecretUnlocks() {
     if (ownedCount(s.id) > 0) return;
     if (progressFor(s.unlock) >= targetFor(s.unlock)) {
       State.owned[s.id] = 1;
+      State.gems += 3;
       newlyUnlocked.push(s);
     }
   });
@@ -1000,6 +1026,7 @@ function placeHiddenSpots() {
       e.preventDefault();
       if (ownedCount(h.id) > 0) return;
       State.owned[h.id] = 1;
+      State.gems += 3;
       save();
       spot.remove();
       celebrateHiddenFind(h);
@@ -1169,11 +1196,13 @@ function renderShop() {
     grid.appendChild(banner);
   }
 
-  // Pack visibility cascades by tier
-  let visiblePacks;
-  if (ultra) visiblePacks = PACKS.filter(p => p.tier3);
-  else if (endgameOn) visiblePacks = PACKS.filter(p => p.requiresAll && !p.tier3);
-  else visiblePacks = PACKS.filter(p => !p.requiresAll);
+  // Pack visibility cascades by tier — but diamond/gem packs are always shown
+  const alwaysPacks = PACKS.filter(p => p.alwaysShow);
+  let tierPacks;
+  if (ultra) tierPacks = PACKS.filter(p => p.tier3);
+  else if (endgameOn) tierPacks = PACKS.filter(p => p.requiresAll && !p.tier3);
+  else tierPacks = PACKS.filter(p => !p.requiresAll && !p.alwaysShow);
+  const visiblePacks = [...alwaysPacks, ...tierPacks];
   visiblePacks.forEach(p => {
     const hasToken = (State.tokens[p.id] || 0) > 0;
     const cur = p.currency === "gems" ? State.gems : State.coins;
@@ -1248,7 +1277,10 @@ function bulkOpenPack(pack, qty) {
     const buddy = pickFromPack(pack);
     const wasNew = !discovered(buddy.id);
     State.owned[buddy.id] = (State.owned[buddy.id] || 0) + 1;
-    if (buddy.rarity === "mystical") State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
+    if (buddy.rarity === "mystical") {
+      State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
+      State.gems += 1;
+    }
     if (wasNew) newCount++;
     if (!results[buddy.id]) results[buddy.id] = { buddy, count: 0, isNew: wasNew };
     results[buddy.id].count++;
@@ -1336,7 +1368,11 @@ function openPack(pack) {
   const buddy = pickFromPack(pack);
   const isNew = !discovered(buddy.id);
   State.owned[buddy.id] = (State.owned[buddy.id] || 0) + 1;
-  if (buddy.rarity === "mystical") State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
+  if (buddy.rarity === "mystical") {
+    State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
+    State.gems += 1;
+    floatText("+1 💎", "#6cf0c2");
+  }
   const wasEnd = State.endgameUnlocked;
   const wasUltra = State.ultraUnlocked;
   checkEndgameUnlock();
@@ -1394,13 +1430,15 @@ function renderDex() {
     grid.innerHTML = `<div class="empty-msg">No buddies match this filter.</div>`;
   } else {
     const packOf = b => PACKS.find(pk => pk.id === b.packId);
+    const isDiamond = b => { const p = packOf(b); return p && p.alwaysShow; };
     const isEndgame = b => { const p = packOf(b); return p && p.requiresAll && !p.tier3; };
     const isTier3  = b => { const p = packOf(b); return p && p.tier3; };
     const isSecret = b => !!b.secret;
     const isHidden = b => !!b.hidden;
-    const baseVis = visible.filter(b => !isEndgame(b) && !isTier3(b) && !isSecret(b) && !isHidden(b));
+    const baseVis = visible.filter(b => !isEndgame(b) && !isTier3(b) && !isSecret(b) && !isHidden(b) && !isDiamond(b));
     const endgameVis = visible.filter(b => isEndgame(b));
     const tier3Vis = visible.filter(b => isTier3(b));
+    const diamondVis = visible.filter(b => isDiamond(b));
     const secretVis = visible.filter(b => isSecret(b));
     const hiddenVis = visible.filter(b => isHidden(b) && discovered(b.id));
 
@@ -1442,6 +1480,14 @@ function renderDex() {
       h.innerHTML = `★★ TIER 3 ULTRA BUDDIES ★★ <span class="dex-h-count">${t3OwnedC}/${tier3Vis.length}</span>${State.ultraUnlocked ? "" : " <span class=\"dex-h-locked\">🔒 Locked</span>"}`;
       grid.appendChild(h);
       tier3Vis.forEach(renderCard);
+    }
+    if (diamondVis.length > 0) {
+      const dOwnedC = diamondVis.filter(b => discovered(b.id)).length;
+      const h = document.createElement("div");
+      h.className = "dex-section-header diamond-header";
+      h.innerHTML = `💎 DIAMOND BUDDIES <span class="dex-h-count">${dOwnedC}/${diamondVis.length}</span> <span class="dex-h-hint">Gem-only</span>`;
+      grid.appendChild(h);
+      diamondVis.forEach(renderCard);
     }
     // HIDDEN BUDDIES section — only appears once you've found at least one
     if (hiddenVis.length > 0) {
