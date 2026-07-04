@@ -1853,6 +1853,8 @@ const GAME_MODES = [
   { id: "color",  emoji: "🎨", name: "Color Rush",    desc: "Tap the matching color slot before each falling buddy hits the ground." }
 ];
 
+const Modes = {};
+
 // ====== 1. REEL IT IN ======
 Modes.reel = {
   start(canvas) {
