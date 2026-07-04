@@ -1841,1010 +1841,596 @@ function setupNav() {
 // ===========================================================
 
 const GAME_MODES = [
-  { id: "defense",  emoji: "🏰", name: "Buddy Defense",  desc: "Place buddies to stop waves of glitch monsters.",            maxReward: 250 },
-  { id: "tycoon",   emoji: "💰", name: "Coin Tycoon",    desc: "Serve customers fast as they spawn. 60 seconds.",            maxReward: 400 },
-  { id: "clash",    emoji: "🌋", name: "Elemental Clash",desc: "1v1 type battle. Ocean > Fire > Camp > Ocean.",              maxReward: 200 },
-  { id: "incubator",emoji: "🏢", name: "The Incubator",  desc: "Place buddies in pods to auto-generate coins.",              maxReward: 300 },
-  { id: "raiders",  emoji: "🏴‍☠️", name: "Island Raiders",desc: "Aim the catapult and steal treasure from the rival island.",maxReward: 250 },
-  { id: "rush",     emoji: "🏃", name: "Buddy Rush",     desc: "Race across the board game. Roll dice, beat the bot.",       maxReward: 200 },
-  { id: "siege",    emoji: "👑", name: "Castle Siege",   desc: "Defend the throne. Tap attackers as they swarm.",            maxReward: 250 },
-  { id: "lab",      emoji: "🧪", name: "Mutation Lab",   desc: "Tap to earn DNA. Fuse buddies to defeat the boss.",          maxReward: 220 },
-  { id: "glitch",   emoji: "🕵️", name: "Glitch Hunt",   desc: "Find the imposter in each round.",                            maxReward: 200 },
-  { id: "feast",    emoji: "🥞", name: "The Feast",      desc: "Feed the dragon. Match its cravings in order.",              maxReward: 250 }
+  { id: "reel",   emoji: "🎣", name: "Reel It In",    desc: "Cast the line, stop the bobber in the green zone." },
+  { id: "whack",  emoji: "🔨", name: "Whack Attack",  desc: "3×3 grid. Tap buddies before they duck. 60 seconds." },
+  { id: "memory", emoji: "🃏", name: "Memory Match",  desc: "Flip cards, find matching pairs before time runs out." },
+  { id: "aim",    emoji: "🎯", name: "Perfect Aim",   desc: "Fire when the crosshair hits dead center. 10 shots." },
+  { id: "defuse", emoji: "💣", name: "Bomb Defuse",   desc: "Cut every wire except the target color." },
+  { id: "dice",   emoji: "🎲", name: "Dice Duel",     desc: "Higher or lower? Extend your streak, 3 wrong = end." },
+  { id: "dodge",  emoji: "🚗", name: "Traffic Dodge", desc: "Swap lanes to dodge falling obstacles. Survive 60s." },
+  { id: "simon",  emoji: "🧠", name: "Simon Says",    desc: "Watch the sequence, repeat it. Grows every round." },
+  { id: "react",  emoji: "⚡", name: "Reaction Test", desc: "Wait for green, then tap fast. Best of 5." },
+  { id: "color",  emoji: "🎨", name: "Color Rush",    desc: "Tap the matching color slot before each falling buddy hits the ground." }
 ];
 
-const GameRunner = {
-  current: null,
-  coins: 0, score: 0, time: 0,
-  timer: null,
-  onTick: null
-};
-
-function renderPlay() {
-  const grid = $("modeGrid");
-  grid.innerHTML = "";
-  GAME_MODES.forEach(m => {
-    const card = document.createElement("div");
-    card.className = "mode-card";
-    card.innerHTML = `
-      <div class="mode-emoji">${m.emoji}</div>
-      <div class="mode-name">${m.name}</div>
-      <div class="mode-desc">${m.desc}</div>
-    `;
-    card.onclick = () => startMode(m.id);
-    grid.appendChild(card);
-  });
-}
-
-function startMode(id) {
-  GameRunner.current = id;
-  GameRunner.coins = 0; GameRunner.score = 0; GameRunner.time = 0;
-  if (GameRunner.timer) clearInterval(GameRunner.timer);
-  const mode = GAME_MODES.find(m => m.id === id);
-  $("gameTitle").textContent = mode.emoji + " " + mode.name;
-  $("gameCoins").textContent = 0;
-  $("gameScore").textContent = 0;
-  $("gameTimer").textContent = "—";
-  $("gameCanvas").innerHTML = "";
-  show("gameRunner");
-  Modes[id].start($("gameCanvas"));
-}
-
-function updateGameHUD() {
-  $("gameCoins").textContent = GameRunner.coins;
-  $("gameScore").textContent = GameRunner.score;
-}
-
-function gameTimer(secs, onEnd) {
-  GameRunner.time = secs;
-  $("gameTimer").textContent = secs;
-  GameRunner.timer = setInterval(() => {
-    GameRunner.time--;
-    $("gameTimer").textContent = GameRunner.time;
-    if (GameRunner.onTick) GameRunner.onTick();
-    if (GameRunner.time <= 0) {
-      clearInterval(GameRunner.timer);
-      GameRunner.timer = null;
-      onEnd();
-    }
-  }, 1000);
-}
-
-function endGame({ win, title, coins, stats }) {
-  if (GameRunner.timer) { clearInterval(GameRunner.timer); GameRunner.timer = null; }
-  GameRunner.onTick = null;
-  coins = Math.round(coins);
-  State.coins += coins;
-  if (win) State.achievements.games_won = (State.achievements.games_won || 0) + 1;
-  save();
-  updateWallet();
-  renderShop();
-  maybeUnlockSecrets();
-  $("gameResultIcon").textContent = win ? "🏆" : "💪";
-  $("gameResultTitle").textContent = title || (win ? "VICTORY!" : "GAME OVER");
-  $("gameResultTitle").style.color = win ? "var(--accent2)" : "var(--pink)";
-  $("gameResultCoins").textContent = coins.toLocaleString();
-  $("gameResultStats").innerHTML = stats || "";
-  $("gameResult").classList.add("show");
-}
-
-// ---------- Mode implementations ----------
-const Modes = {};
-
-// ====== 1. BUDDY DEFENSE ======
-Modes.defense = {
+// ====== 1. REEL IT IN ======
+Modes.reel = {
   start(canvas) {
-    const ROWS = 5, COLS = 8, PATH_ROW = 2;
-    const state = { wave: 1, hp: 100, money: 30, selected: null, towers: [], enemies: [], spawning: false };
-    GameRunner.coins = 0;
     canvas.innerHTML = `
-      <div class="td-shop">
-        <div class="td-shop-item" data-tower="basic"><div class="td-icon">🗼</div><div>Basic</div><div class="td-cost">10🪙</div></div>
-        <div class="td-shop-item" data-tower="ice"><div class="td-icon">❄️</div><div>Ice</div><div class="td-cost">20🪙</div></div>
-        <div class="td-shop-item" data-tower="laser"><div class="td-icon">⚡</div><div>Laser</div><div class="td-cost">30🪙</div></div>
+      <div style="text-align:center;color:var(--dim);margin-bottom:14px">
+        Tap CAST to launch the bobber. Tap STOP when it's in the <span style="color:#4ade80">green zone</span>!
       </div>
-      <div class="td-board" id="tdBoard"></div>
-      <div style="text-align:center;margin-top:12px;color:var(--dim)">
-        HP: <span id="tdHP">100</span> · Money: <span id="tdMoney">30</span>🪙 · Wave: <span id="tdWave">1</span>/10
+      <div class="reel-wrap">
+        <div class="reel-bar"><div class="reel-green"></div><div id="reelBobber" class="reel-bobber">🎣</div></div>
       </div>
+      <div style="text-align:center;margin-top:14px;color:var(--dim)">
+        Casts left: <span id="reelCasts">10</span> · Caught: <span id="reelCaught">0</span>
+      </div>
+      <div style="text-align:center;margin-top:16px"><button class="big-btn" id="reelBtn">CAST</button></div>
     `;
-    const board = $("tdBoard");
-    const cells = [];
-    for (let r = 0; r < ROWS; r++) {
-      const row = document.createElement("div");
-      row.className = "td-row";
-      cells.push([]);
-      for (let c = 0; c < COLS; c++) {
-        const cell = document.createElement("div");
-        cell.className = "td-cell";
-        if (r === PATH_ROW) cell.classList.add("path");
-        if (r === PATH_ROW && c === 0) cell.classList.add("base");
-        if (r === PATH_ROW && c === 0) cell.textContent = "🏯";
-        cell.dataset.r = r; cell.dataset.c = c;
-        cell.onclick = () => placeTower(r, c, cell);
-        row.appendChild(cell);
-        cells[r].push(cell);
-      }
-      board.appendChild(row);
-    }
-
-    const TOWERS = {
-      basic: { icon: "🗼", cost: 10, dmg: 1, range: 2, freeze: 0, fireMs: 800 },
-      ice:   { icon: "❄️", cost: 20, dmg: 1, range: 2, freeze: 0.4, fireMs: 1200 },
-      laser: { icon: "⚡", cost: 30, dmg: 2, range: 4, freeze: 0, fireMs: 1000 }
-    };
-
-    document.querySelectorAll(".td-shop-item").forEach(el => {
-      el.onclick = () => {
-        document.querySelectorAll(".td-shop-item").forEach(e => e.classList.remove("selected"));
-        el.classList.add("selected");
-        state.selected = el.dataset.tower;
-      };
-    });
-
-    function placeTower(r, c, cell) {
-      if (r === PATH_ROW) return;
-      if (cell.classList.contains("has-tower")) return;
-      if (!state.selected) return;
-      const t = TOWERS[state.selected];
-      if (state.money < t.cost) return;
-      state.money -= t.cost;
-      cell.classList.add("has-tower");
-      cell.textContent = t.icon;
-      state.towers.push({ r, c, ...t, lastFire: 0, cell });
-      updateHUD();
-    }
-    function updateHUD() {
-      $("tdHP").textContent = Math.max(0, state.hp);
-      $("tdMoney").textContent = state.money;
-      $("tdWave").textContent = state.wave;
-      GameRunner.coins = (state.wave - 1) * 15;
-      GameRunner.score = state.wave * 10 + state.towers.length;
-      updateGameHUD();
-    }
-
-    function spawnEnemy() {
-      const enemy = {
-        col: COLS - 1, hp: 1 + Math.floor(state.wave / 2),
-        maxHp: 1 + Math.floor(state.wave / 2),
-        speed: 0.08 + state.wave * 0.005,
-        slowed: 0,
-        el: document.createElement("div")
-      };
-      enemy.el.className = "td-enemy";
-      enemy.el.textContent = ["👹","👻","💀","👽"][Math.floor(Math.random()*4)];
-      cells[PATH_ROW][Math.floor(enemy.col)].appendChild(enemy.el);
-      state.enemies.push(enemy);
-    }
-
-    function startWave() {
-      state.spawning = true;
-      const count = 4 + state.wave;
-      let spawned = 0;
-      const sp = setInterval(() => {
-        if (spawned >= count) { clearInterval(sp); state.spawning = false; return; }
-        spawnEnemy(); spawned++;
-      }, 800 - state.wave * 30);
-    }
-
+    let casts = 10, caught = 0, moving = false, dir = 1, pos = 0, timer;
+    const bobber = $("reelBobber");
     function tick() {
-      // Move enemies
-      state.enemies.forEach(e => {
-        const speed = e.slowed > 0 ? e.speed * 0.5 : e.speed;
-        if (e.slowed > 0) e.slowed -= 0.1;
-        e.col -= speed;
-        if (e.col <= 0) {
-          state.hp -= 12;
-          e.el.remove();
-          e.dead = true;
-        } else {
-          const targetCell = cells[PATH_ROW][Math.floor(e.col)];
-          if (targetCell && e.el.parentElement !== targetCell) targetCell.appendChild(e.el);
-        }
-      });
-      state.enemies = state.enemies.filter(e => !e.dead && e.hp > 0);
-
-      // Towers fire
-      const now = Date.now();
-      state.towers.forEach(t => {
-        if (now - t.lastFire < t.fireMs) return;
-        const target = state.enemies.find(e => {
-          const dx = Math.abs(e.col - t.c);
-          const dy = Math.abs(PATH_ROW - t.r);
-          return dx + dy <= t.range && Math.abs(PATH_ROW - t.r) <= t.range;
-        });
-        if (target) {
-          target.hp -= t.dmg;
-          t.lastFire = now;
-          if (t.freeze) target.slowed = t.freeze * 10;
-          if (target.hp <= 0) {
-            target.el.remove(); target.dead = true;
-            state.money += 5;
-          }
-          // flash
-          t.cell.style.filter = "brightness(2)";
-          setTimeout(() => t.cell.style.filter = "", 100);
-        }
-      });
-
-      updateHUD();
-
-      if (state.hp <= 0) { stop(false); return; }
-      if (!state.spawning && state.enemies.length === 0) {
-        if (state.wave >= 10) { stop(true); return; }
-        state.wave++; state.money += 20;
-        setTimeout(startWave, 1200);
-      }
+      pos += dir * 1.8;
+      if (pos >= 100) { pos = 100; dir = -1; }
+      if (pos <= 0)   { pos = 0;   dir = 1; }
+      bobber.style.left = pos + "%";
     }
-
-    const gameTick = setInterval(tick, 100);
-
-    function stop(win) {
-      clearInterval(gameTick);
-      const coins = (state.wave - 1) * 15 + (win ? 100 : 0);
-      endGame({
-        win, coins,
-        title: win ? "🏰 Base Defended!" : "Base Lost",
-        stats: `Waves cleared: ${state.wave - 1}/10 · Towers built: ${state.towers.length}`
-      });
-    }
-
-    GameRunner.onQuit = () => clearInterval(gameTick);
-    startWave();
-  }
-};
-
-// ====== 2. COIN TYCOON ======
-Modes.tycoon = {
-  start(canvas) {
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:10px">
-        Click customers as fast as you can! They're worth more as time goes on.
-      </div>
-      <div id="tycoonField" class="tycoon-field"></div>
-    `;
-    const field = $("tycoonField");
-    let total = 0, served = 0;
-    const customers = [];
-    const emojis = ["🧑","👨","👩","🧒","👴","👵","🧔","👱","🤴","👸"];
-
-    function spawnCustomer() {
-      const c = document.createElement("div");
-      c.className = "tycoon-cust";
-      c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      const w = field.offsetWidth - 60;
-      const h = field.offsetHeight - 60;
-      c.style.left = Math.random() * w + "px";
-      c.style.top = Math.random() * h + "px";
-      const value = 5 + Math.floor((60 - GameRunner.time) * 0.4);
-      c.onclick = () => {
-        c.classList.add("served");
-        total += value;
-        served++;
-        GameRunner.coins = total;
-        GameRunner.score = served;
+    $("reelBtn").onclick = () => {
+      if (moving) {
+        moving = false; clearInterval(timer);
+        const perfect = pos >= 45 && pos <= 55;
+        const hit = pos >= 38 && pos <= 62;
+        if (perfect) { caught++; GameRunner.coins += 50; floatText("PERFECT +50", "#ffd93d"); }
+        else if (hit) { caught++; GameRunner.coins += 25; floatText("+25", "#4ade80"); }
+        else { floatText("Miss!", "#ff5470"); }
+        casts--;
+        $("reelCasts").textContent = casts;
+        $("reelCaught").textContent = caught;
+        GameRunner.score = caught;
         updateGameHUD();
-        floatText("+" + value, "#ffd93d");
-        setTimeout(() => c.remove(), 400);
-      };
-      field.appendChild(c);
-      setTimeout(() => { if (c.parentElement) c.remove(); }, 3500);
-    }
-
-    const sp = setInterval(spawnCustomer, 600);
-    spawnCustomer(); spawnCustomer();
-
-    GameRunner.onQuit = () => { clearInterval(sp); };
-
-    gameTimer(60, () => {
-      clearInterval(sp);
-      endGame({
-        win: total > 100,
-        coins: total,
-        title: "💰 Shift Over!",
-        stats: `Customers served: ${served}`
-      });
-    });
-  }
-};
-
-// ====== 3. ELEMENTAL CLASH ======
-Modes.clash = {
-  start(canvas) {
-    canvas.innerHTML = `
-      <div class="clash-wrap">
-        <div class="clash-vs">
-          <div class="clash-side">
-            <h3>YOU</h3>
-            <div class="clash-team" id="myTeam"></div>
-          </div>
-          <div style="font-size:24px;font-weight:900">VS</div>
-          <div class="clash-side">
-            <h3>RIVAL</h3>
-            <div class="clash-team" id="botTeam"></div>
-          </div>
-        </div>
-        <h3 style="margin:10px 0">Pick your element:</h3>
-        <div class="clash-types">
-          <div class="clash-type-btn" data-type="ocean"><span class="ct-icon">🌊</span>Ocean</div>
-          <div class="clash-type-btn" data-type="fire"><span class="ct-icon">🔥</span>Fire</div>
-          <div class="clash-type-btn" data-type="camp"><span class="ct-icon">🏕️</span>Camp</div>
-        </div>
-        <div class="clash-log" id="clashLog">Choose a type. Ocean beats Fire, Fire beats Camp, Camp beats Ocean.</div>
-      </div>
-    `;
-    const state = { you: 3, bot: 3, wins: 0 };
-    const renderTeams = () => {
-      const yt = $("myTeam"), bt = $("botTeam");
-      yt.innerHTML = ""; bt.innerHTML = "";
-      for (let i = 0; i < 3; i++) {
-        const ys = document.createElement("div");
-        ys.className = "clash-slot" + (i >= state.you ? " defeated" : "");
-        ys.textContent = i < state.you ? "🐉" : "💀";
-        yt.appendChild(ys);
-        const bs = document.createElement("div");
-        bs.className = "clash-slot" + (i >= state.bot ? " defeated" : "");
-        bs.textContent = i < state.bot ? "👹" : "💀";
-        bt.appendChild(bs);
-      }
-    };
-    renderTeams();
-
-    const beats = { ocean: "fire", fire: "camp", camp: "ocean" };
-    const emoji = { ocean: "🌊", fire: "🔥", camp: "🏕️" };
-
-    document.querySelectorAll(".clash-type-btn").forEach(btn => {
-      btn.onclick = () => {
-        const my = btn.dataset.type;
-        const types = ["ocean","fire","camp"];
-        const bot = types[Math.floor(Math.random()*3)];
-        let msg = `You: ${emoji[my]} ${my.toUpperCase()} vs Rival: ${emoji[bot]} ${bot.toUpperCase()} — `;
-        if (my === bot) msg += "Tie!";
-        else if (beats[my] === bot) { state.bot--; state.wins++; msg += "WIN!"; }
-        else { state.you--; msg += "Loss!"; }
-        $("clashLog").textContent = msg;
-        renderTeams();
-        if (state.you <= 0 || state.bot <= 0) finish();
-      };
-    });
-
-    function finish() {
-      const win = state.bot <= 0;
-      const coins = win ? 150 + state.you * 25 : 40 + state.wins * 15;
-      endGame({
-        win, coins,
-        title: win ? "🌋 Arena Champion!" : "Arena Loss",
-        stats: `Rounds won: ${state.wins}`
-      });
-    }
-  }
-};
-
-// ====== 4. INCUBATOR ======
-Modes.incubator = {
-  start(canvas) {
-    // Step 1: duration picker
-    canvas.innerHTML = `
-      <div class="inc-dur-card">
-        <h2>🏢 The Incubator</h2>
-        <p>Choose how long to run the hatching pods.</p>
-        <div class="inc-dur-display"><span id="incDurVal">45</span><small id="incDurUnit">seconds</small></div>
-        <input type="range" min="1" max="300" value="45" id="incDurSlider" class="inc-dur-slider">
-        <div class="inc-dur-row">
-          <button class="dur-quick" data-d="1">1s</button>
-          <button class="dur-quick" data-d="30">30s</button>
-          <button class="dur-quick" data-d="60">1m</button>
-          <button class="dur-quick" data-d="120">2m</button>
-          <button class="dur-quick" data-d="300">5m</button>
-        </div>
-        <button class="big-btn" id="incStartBtn">Start Incubator</button>
-      </div>
-    `;
-    function fmt(sec) {
-      if (sec < 60) return { num: sec, unit: sec === 1 ? "second" : "seconds" };
-      const m = Math.floor(sec / 60), s = sec % 60;
-      return { num: s ? `${m}:${String(s).padStart(2,"0")}` : m, unit: s ? "minutes" : (m === 1 ? "minute" : "minutes") };
-    }
-    const slider = $("incDurSlider");
-    const val = $("incDurVal");
-    const unit = $("incDurUnit");
-    function update(sec) {
-      const f = fmt(parseInt(sec));
-      val.textContent = f.num;
-      unit.textContent = f.unit;
-    }
-    slider.oninput = (e) => update(e.target.value);
-    document.querySelectorAll(".dur-quick").forEach(b => {
-      b.onclick = () => { slider.value = b.dataset.d; update(b.dataset.d); };
-    });
-    const self = this;
-    $("incStartBtn").onclick = () => self._begin(canvas, parseInt(slider.value));
-  },
-  _begin(canvas, duration) {
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:10px">
-        Place buddies in pods. Each rarity earns different rates per second.
-      </div>
-      <div id="incGrid" class="inc-grid"></div>
-      <div class="inc-buddy-picker" id="incPicker">
-        <div class="inc-picker-inner">
-          <h3>Select a Buddy</h3>
-          <div class="ip-filter-row" id="incPickerFilter"></div>
-          <div id="incPickerGrid" class="inc-picker-grid"></div>
-        </div>
-      </div>
-    `;
-    const pods = Array(6).fill(null);
-    const rates = { common:1, uncommon:2, rare:5, epic:12, legendary:30, chroma:60, mystical:100, secret:200 };
-    let activeSlot = null;
-    let pickerFilter = "all";
-
-    function renderPods() {
-      const grid = $("incGrid");
-      grid.innerHTML = "";
-      pods.forEach((b, i) => {
-        const pod = document.createElement("div");
-        pod.className = "inc-pod" + (b ? " filled" : "");
-        if (b) {
-          pod.innerHTML = `<div class="inc-pod-icon">${buddyFrame(b.emoji, b.rarity, "", b.effect, b.id)}</div><div>${b.name}</div><div class="inc-pod-rate">+${rates[b.rarity]}/s</div>`;
-        } else {
-          pod.innerHTML = `<div class="inc-pod-icon">➕</div><div class="dim">Empty</div>`;
-        }
-        pod.onclick = () => { activeSlot = i; showPicker(); };
-        grid.appendChild(pod);
-      });
-    }
-    function placedCount(buddyId) {
-      // Don't count the active slot — it's about to be replaced
-      return pods.filter((p, i) => p && p.id === buddyId && i !== activeSlot).length;
-    }
-    function renderPickerFilters() {
-      const owned = BUDDIES.filter(b => ownedCount(b.id) > 0);
-      const usedRarities = RARITY_ORDER.filter(r => owned.some(b => b.rarity === r));
-      const wrap = $("incPickerFilter");
-      wrap.innerHTML = "";
-      const opts = [["all", "All"], ...usedRarities.map(r => [r, RARITIES[r].name])];
-      opts.forEach(([key, label]) => {
-        const btn = document.createElement("button");
-        btn.className = "ip-filter-btn" + (pickerFilter === key ? " active" : "") + (key !== "all" ? " r-" + key : "");
-        btn.textContent = label;
-        btn.onclick = () => { pickerFilter = key; renderPickerFilters(); renderPickerGrid(); };
-        wrap.appendChild(btn);
-      });
-    }
-
-    function renderPickerGrid() {
-      const picker = $("incPickerGrid");
-      picker.innerHTML = "";
-      const owned = BUDDIES.filter(b => ownedCount(b.id) > 0);
-      if (owned.length === 0) {
-        picker.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--dim)">No buddies yet. Open a pack first!</div>`;
-        return;
-      }
-      const tiers = (pickerFilter === "all" ? RARITY_ORDER.slice().reverse() : [pickerFilter]);
-      tiers.forEach(rar => {
-        const inTier = owned.filter(b => b.rarity === rar);
-        if (inTier.length === 0) return;
-        inTier.sort((a, b) => a.name.localeCompare(b.name));
-
-        const header = document.createElement("div");
-        header.className = "ip-section-header";
-        header.innerHTML = `<span class="r-${rar}">${RARITIES[rar].name}</span> <span class="ip-rate-tag">+${rates[rar]}/s</span>`;
-        picker.appendChild(header);
-
-        inTier.forEach(b => {
-          const own = ownedCount(b.id);
-          const placed = placedCount(b.id);
-          const available = own - placed;
-          const card = document.createElement("div");
-          card.className = "inc-picker-buddy" + (available <= 0 ? " ip-disabled" : "");
-          card.innerHTML = `
-            <div class="ip-emoji">${buddyFrame(b.emoji, b.rarity, "", b.effect, b.id)}</div>
-            <div class="ip-name">${b.name}</div>
-            <div style="font-size:9px;color:${available > 0 ? 'var(--accent2)' : 'var(--red)'}">${available}/${own} free</div>
-          `;
-          if (available > 0) {
-            card.onclick = () => {
-              pods[activeSlot] = b;
-              $("incPicker").classList.remove("show");
-              renderPods();
-            };
-          }
-          picker.appendChild(card);
-        });
-      });
-    }
-
-    function showPicker() {
-      renderPickerFilters();
-      renderPickerGrid();
-      $("incPicker").classList.add("show");
-    }
-    $("incPicker").onclick = (e) => {
-      if (e.target.id === "incPicker") $("incPicker").classList.remove("show");
-    };
-    renderPods();
-
-    GameRunner.onTick = () => {
-      let total = 0;
-      pods.forEach(b => { if (b) total += rates[b.rarity]; });
-      GameRunner.coins += total;
-      GameRunner.score = total;
-      updateGameHUD();
-    };
-
-    gameTimer(duration, () => {
-      endGame({
-        win: GameRunner.coins > 0,
-        coins: GameRunner.coins,
-        title: "🏢 Hatching Complete!",
-        stats: `Duration: ${duration}s · Rate: ${GameRunner.score}/s · Pods filled: ${pods.filter(Boolean).length}/6`
-      });
-    });
-  }
-};
-
-// ====== 5. ISLAND RAIDERS ======
-Modes.raiders = {
-  start(canvas) {
-    let shots = 5, hits = 0;
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:10px">
-        Aim and launch! Hit the rival fortress to steal treasure. <span id="rdShots">${shots}</span> shots left.
-      </div>
-      <div id="rdField" class="island-field">
-        <div class="island-catapult">🏹</div>
-        <div class="island-target">🏰</div>
-      </div>
-      <div class="island-controls">
-        <label>Angle: <input id="rdAngle" type="range" min="15" max="75" value="45"><span id="rdAngleV">45°</span></label>
-        <label>Power: <input id="rdPower" type="range" min="40" max="100" value="70"><span id="rdPowerV">70</span></label>
-        <button class="big-btn" id="rdLaunch" style="padding:12px 24px;font-size:14px">LAUNCH</button>
-      </div>
-    `;
-    $("rdAngle").oninput = e => $("rdAngleV").textContent = e.target.value + "°";
-    $("rdPower").oninput = e => $("rdPowerV").textContent = e.target.value;
-
-    $("rdLaunch").onclick = () => {
-      if (shots <= 0) return;
-      shots--;
-      $("rdShots").textContent = shots;
-      const angle = +$("rdAngle").value;
-      const power = +$("rdPower").value;
-      launch(angle, power);
-    };
-
-    function launch(angle, power) {
-      const field = $("rdField");
-      const w = field.offsetWidth, h = field.offsetHeight;
-      const startX = 50, startY = h - 60;
-      const targetX = w - 70;
-      const proj = document.createElement("div");
-      proj.className = "island-projectile";
-      proj.textContent = "💣";
-      field.appendChild(proj);
-
-      const rad = angle * Math.PI / 180;
-      const v = power * 0.06;
-      const vx = v * Math.cos(rad);
-      const vy = -v * Math.sin(rad);
-      let t = 0;
-      const g = 0.02;
-      const anim = setInterval(() => {
-        t += 1;
-        const x = startX + vx * t;
-        const y = startY + vy * t + 0.5 * g * t * t;
-        proj.style.left = x + "px";
-        proj.style.top = y + "px";
-        if (y > h - 30 || x > w) {
-          clearInterval(anim);
-          const dist = Math.abs(x - targetX);
-          if (dist < 80) {
-            hits++;
-            const coins = 50 + Math.floor((80 - dist) * 0.3);
-            GameRunner.coins += coins;
-            GameRunner.score = hits;
-            updateGameHUD();
-            floatText("HIT +" + coins, "#4ade80");
-            $("rdField").style.boxShadow = "inset 0 0 60px var(--green)";
-            setTimeout(() => $("rdField").style.boxShadow = "", 300);
-          } else {
-            floatText("MISS!", "#ff5470");
-            $("rdField").style.boxShadow = "inset 0 0 60px var(--red)";
-            setTimeout(() => $("rdField").style.boxShadow = "", 300);
-          }
-          proj.remove();
-          if (shots <= 0) finish();
-        }
-      }, 20);
-    }
-
-    function finish() {
-      endGame({
-        win: hits >= 3,
-        coins: GameRunner.coins,
-        title: hits >= 3 ? "🏴‍☠️ Treasure Stolen!" : "Raid Over",
-        stats: `Hits: ${hits}/5`
-      });
-    }
-  }
-};
-
-// ====== 6. BUDDY RUSH ======
-Modes.rush = {
-  start(canvas) {
-    const N = 30;
-    const board = [];
-    const specials = { trap: -3, shortcut: 5, mystery: 0 };
-    for (let i = 0; i < N; i++) {
-      if (i === 0) board.push("start");
-      else if (i === N-1) board.push("finish");
-      else {
-        const r = Math.random();
-        if (r < 0.1) board.push("trap");
-        else if (r < 0.2) board.push("shortcut");
-        else if (r < 0.27) board.push("mystery");
-        else board.push("normal");
-      }
-    }
-    let you = 0, bot = 0, rolling = false;
-    canvas.innerHTML = `
-      <div class="rush-board" id="rushBoard"></div>
-      <div class="rush-controls">
-        <span class="rush-dice" id="rushDice">🎲</span>
-        <button class="big-btn" id="rushRoll" style="padding:12px 28px;font-size:15px">ROLL</button>
-      </div>
-      <div class="rush-log" id="rushLog">Roll to start. First to tile 30 wins!</div>
-    `;
-    function render() {
-      const b = $("rushBoard");
-      b.innerHTML = "";
-      board.forEach((t, i) => {
-        const tile = document.createElement("div");
-        tile.className = "rush-tile " + t;
-        if (you === i && bot === i) tile.classList.add("both");
-        else if (you === i) tile.classList.add("you");
-        else if (bot === i) tile.classList.add("bot");
-        if (t === "start") tile.textContent = "S";
-        else if (t === "finish") tile.textContent = "🏁";
-        else tile.textContent = i;
-        b.appendChild(tile);
-      });
-    }
-    render();
-
-    function log(msg) { $("rushLog").innerHTML = msg + "<br>" + $("rushLog").innerHTML; }
-    function move(who, n) {
-      let pos = who === "you" ? you : bot;
-      pos = Math.min(N-1, pos + n);
-      const t = board[pos];
-      let extra = "";
-      if (t === "trap") { pos = Math.max(0, pos - 3); extra = " — TRAP! Back 3"; }
-      else if (t === "shortcut") { pos = Math.min(N-1, pos + 5); extra = " — SHORTCUT! +5"; }
-      else if (t === "mystery") {
-        const bonus = Math.floor(Math.random() * 30) + 10;
-        GameRunner.coins += bonus;
-        extra = ` — MYSTERY! +${bonus}🪙`;
-      }
-      if (who === "you") you = pos; else bot = pos;
-      log(`${who === "you" ? "🔵 You" : "🔴 Bot"} rolled ${n}, now on ${pos}${extra}`);
-      render();
-    }
-
-    $("rushRoll").onclick = () => {
-      if (rolling) return; rolling = true;
-      const dice = $("rushDice");
-      const faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
-      let spins = 8;
-      const spin = setInterval(() => {
-        dice.textContent = faces[Math.floor(Math.random()*6)];
-        spins--;
-        if (spins <= 0) {
-          clearInterval(spin);
-          const roll = Math.floor(Math.random()*6) + 1;
-          dice.textContent = faces[roll-1];
-          move("you", roll);
-          if (you >= N-1) { finish(true); return; }
-          setTimeout(() => {
-            const botRoll = Math.floor(Math.random()*6) + 1;
-            move("bot", botRoll);
-            if (bot >= N-1) { finish(false); return; }
-            rolling = false;
-          }, 700);
-        }
-      }, 80);
-    };
-
-    function finish(win) {
-      const coins = (win ? 150 : 50) + GameRunner.coins;
-      endGame({
-        win, coins,
-        title: win ? "🏃 You Won the Race!" : "Bot Reached Finish First",
-        stats: `Your tile: ${you} · Bot tile: ${bot}`
-      });
-    }
-  }
-};
-
-// ====== 7. CASTLE SIEGE ======
-Modes.siege = {
-  start(canvas) {
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:10px">
-        Tap attackers before they reach the throne. Earn a multiplier for each second held!
-      </div>
-      <div id="siegeArena" class="siege-arena">
-        <div class="siege-throne">👑</div>
-      </div>
-    `;
-    const arena = $("siegeArena");
-    let kills = 0, breaches = 0, mult = 1;
-    const enemies = [];
-
-    function spawn() {
-      const e = document.createElement("div");
-      e.className = "siege-attacker";
-      e.textContent = ["👹","👺","💀","👻","🧟"][Math.floor(Math.random()*5)];
-      const side = Math.floor(Math.random()*4);
-      const w = arena.offsetWidth, h = arena.offsetHeight;
-      let sx, sy;
-      if (side === 0) { sx = Math.random()*w; sy = -30; }
-      else if (side === 1) { sx = w; sy = Math.random()*h; }
-      else if (side === 2) { sx = Math.random()*w; sy = h; }
-      else { sx = -30; sy = Math.random()*h; }
-      e.style.left = sx + "px"; e.style.top = sy + "px";
-      const tx = w/2 - 18, ty = h/2 - 18;
-      const dx = tx - sx, dy = ty - sy;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      const speed = 0.4 + Math.random() * 0.3 + GameRunner.time * 0.005;
-      const vx = (dx / dist) * speed, vy = (dy / dist) * speed;
-      const enemy = { el: e, x: sx, y: sy, vx, vy, dead: false };
-      e.onclick = () => {
-        if (enemy.dead) return;
-        enemy.dead = true; e.classList.add("dying");
-        kills++;
-        const earn = Math.round(4 * mult);
-        GameRunner.coins += earn;
-        GameRunner.score = kills;
-        floatText("+" + earn, "#ffd93d");
-        setTimeout(() => e.remove(), 400);
-        updateGameHUD();
-      };
-      arena.appendChild(e);
-      enemies.push(enemy);
-    }
-
-    const sp = setInterval(spawn, 700);
-
-    const move = setInterval(() => {
-      enemies.forEach(en => {
-        if (en.dead) return;
-        en.x += en.vx; en.y += en.vy;
-        en.el.style.left = en.x + "px";
-        en.el.style.top = en.y + "px";
-        const tx = arena.offsetWidth/2, ty = arena.offsetHeight/2;
-        if (Math.abs(en.x - tx) < 30 && Math.abs(en.y - ty) < 30) {
-          en.dead = true; en.el.remove();
-          breaches++;
-          if (breaches >= 5) { stop(false); }
-        }
-      });
-    }, 30);
-
-    GameRunner.onTick = () => { mult += 0.1; };
-
-    GameRunner.onQuit = () => { clearInterval(sp); clearInterval(move); };
-
-    gameTimer(45, () => stop(true));
-
-    function stop(win) {
-      clearInterval(sp); clearInterval(move);
-      const coins = GameRunner.coins + (win ? 80 : 0);
-      endGame({
-        win, coins,
-        title: win ? "👑 Throne Held!" : "Castle Breached",
-        stats: `Kills: ${kills} · Breaches: ${breaches}/5 · Final ×: ${mult.toFixed(1)}`
-      });
-    }
-  }
-};
-
-// ====== 8. MUTATION LAB ======
-Modes.lab = {
-  start(canvas) {
-    let dna = 0, bossHp = 200;
-    canvas.innerHTML = `
-      <div class="lab-wrap">
-        <div class="lab-boss" id="labBoss">👾</div>
-        <div class="lab-hp-bar"><div class="lab-hp-fill" id="labHpFill" style="width:100%"></div></div>
-        <div class="lab-info">HP: <span id="labHp">200</span> · DNA: <span id="labDna">0</span></div>
-        <p class="dim">Tap the boss to deal damage and earn 1 DNA. Spend 10 DNA on Fusion Attack.</p>
-        <div class="lab-actions">
-          <button id="labFuse">🧬 Fusion Attack (10 DNA, 30 dmg)</button>
-        </div>
-      </div>
-    `;
-    function render() {
-      $("labHp").textContent = bossHp;
-      $("labDna").textContent = dna;
-      $("labHpFill").style.width = Math.max(0, bossHp / 200 * 100) + "%";
-    }
-    $("labBoss").onclick = () => {
-      if (bossHp <= 0) return;
-      bossHp -= 1; dna += 1;
-      GameRunner.score = dna;
-      updateGameHUD();
-      render();
-      if (bossHp <= 0) finish(true);
-    };
-    $("labFuse").onclick = () => {
-      if (dna < 10 || bossHp <= 0) return;
-      dna -= 10; bossHp -= 30;
-      floatText("FUSION!", "#a855f7");
-      render();
-      updateGameHUD();
-      if (bossHp <= 0) finish(true);
-    };
-
-    gameTimer(60, () => finish(bossHp <= 0));
-
-    function finish(win) {
-      const coins = win ? 200 : Math.floor((200 - bossHp) * 0.5);
-      endGame({
-        win, coins,
-        title: win ? "🧪 Boss Defeated!" : "Boss Survived",
-        stats: `DNA earned: ${dna} · Damage dealt: ${200 - bossHp}`
-      });
-    }
-  }
-};
-
-// ====== 9. GLITCH HUNT ======
-Modes.glitch = {
-  start(canvas) {
-    let round = 1, correct = 0;
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:14px" id="glitchPrompt">
-        Round 1/5: Spot the glitched buddy!
-      </div>
-      <div class="glitch-row" id="glitchRow"></div>
-    `;
-
-    function newRound() {
-      const row = $("glitchRow");
-      row.innerHTML = "";
-      const buddies = ["🐶","🐱","🐰","🐻","🦊","🐼","🐨","🐯"];
-      const same = buddies[Math.floor(Math.random()*buddies.length)];
-      const impIdx = Math.floor(Math.random() * 5);
-      for (let i = 0; i < 5; i++) {
-        const s = document.createElement("div");
-        s.className = "glitch-suspect";
-        s.textContent = same;
-        if (i === impIdx) s.classList.add("imposter-anim");
-        s.onclick = () => {
-          if (i === impIdx) {
-            s.classList.add("revealed-good");
-            correct++;
-            GameRunner.coins += 30;
-            GameRunner.score = correct;
-            floatText("+30", "#4ade80");
-          } else {
-            s.classList.add("revealed-bad");
-            floatText("Miss!", "#ff5470");
-          }
-          updateGameHUD();
-          setTimeout(() => {
-            round++;
-            if (round > 5) finish();
-            else { $("glitchPrompt").textContent = `Round ${round}/5: Spot the glitched buddy!`; newRound(); }
-          }, 600);
-        };
-        row.appendChild(s);
-      }
-    }
-    newRound();
-
-    function finish() {
-      const coins = GameRunner.coins + (correct === 5 ? 50 : 0);
-      endGame({
-        win: correct >= 3,
-        coins,
-        title: correct === 5 ? "🕵️ Perfect Detective!" : (correct >= 3 ? "Good Hunt!" : "Hunt Failed"),
-        stats: `Correct: ${correct}/5`
-      });
-    }
-  }
-};
-
-// ====== 10. THE FEAST ======
-Modes.feast = {
-  start(canvas) {
-    let round = 1, score = 0;
-    const foods = ["🍕","🍔","🍣","🍪","🍩","🍦","🍫","🍇"];
-    let craving = [];
-    let answered = [];
-    canvas.innerHTML = `
-      <div class="feast-wrap">
-        <div class="feast-dragon">🐉</div>
-        <div class="feast-prompt" id="feastPrompt">Memorize the dragon's craving!</div>
-        <div class="feast-cravings" id="feastCravings"></div>
-        <div class="feast-foods" id="feastFoods"></div>
-      </div>
-    `;
-
-    function newRound() {
-      $("feastPrompt").textContent = `Round ${round}/5: Memorize the order!`;
-      const len = 2 + Math.min(3, Math.floor(round / 2));
-      craving = [];
-      for (let i = 0; i < len; i++) craving.push(foods[Math.floor(Math.random() * foods.length)]);
-      answered = [];
-      const c = $("feastCravings");
-      c.innerHTML = "";
-      craving.forEach(f => {
-        const el = document.createElement("div");
-        el.className = "feast-craving";
-        el.textContent = f;
-        c.appendChild(el);
-      });
-      $("feastFoods").innerHTML = "";
-      // Reveal time
-      setTimeout(() => {
-        c.querySelectorAll(".feast-craving").forEach(e => e.textContent = "❓");
-        $("feastPrompt").textContent = "Feed in order!";
-        renderFoods();
-      }, 1500 + len * 400);
-    }
-    function renderFoods() {
-      const g = $("feastFoods");
-      g.innerHTML = "";
-      foods.forEach(f => {
-        const b = document.createElement("div");
-        b.className = "feast-food";
-        b.textContent = f;
-        b.onclick = () => pick(f);
-        g.appendChild(b);
-      });
-    }
-    function pick(f) {
-      const idx = answered.length;
-      if (f === craving[idx]) {
-        $("feastCravings").children[idx].textContent = f;
-        $("feastCravings").children[idx].classList.add("done");
-        answered.push(f);
-        score += 20;
-        GameRunner.coins += 20;
-        GameRunner.score = score;
-        updateGameHUD();
-        if (answered.length === craving.length) {
-          floatText("COMBO!", "#ffd93d");
-          GameRunner.coins += 30;
-          updateGameHUD();
-          setTimeout(() => {
-            round++;
-            if (round > 5) finish();
-            else newRound();
-          }, 800);
+        $("reelBtn").textContent = "CAST";
+        if (casts <= 0) {
+          const bonus = caught >= 8 ? 100 : (caught >= 5 ? 30 : 0);
+          endGame({ win: caught >= 5, coins: GameRunner.coins + bonus, title: "🎣 Fishing Done", stats: `Caught: ${caught}/10 · Bonus: +${bonus}` });
         }
       } else {
-        floatText("Wrong!", "#ff5470");
-        score -= 5;
-        setTimeout(() => {
-          round++;
-          if (round > 5) finish();
-          else newRound();
-        }, 600);
+        moving = true; pos = 0; dir = 1;
+        timer = setInterval(tick, 14);
+        $("reelBtn").textContent = "STOP!";
+      }
+    };
+    GameRunner.onQuit = () => clearInterval(timer);
+  }
+};
+
+// ====== 2. WHACK ATTACK ======
+Modes.whack = {
+  start(canvas) {
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:14px">Tap buddies as they pop up. Under 1 second each!</div>
+      <div class="whack-grid" id="whackGrid"></div>
+    `;
+    const grid = $("whackGrid");
+    for (let i = 0; i < 9; i++) {
+      const c = document.createElement("div");
+      c.className = "whack-cell";
+      c.dataset.i = i;
+      grid.appendChild(c);
+    }
+    let hits = 0, popped = -1, popTimer;
+    const emojis = ["🐶","🐱","🦊","🐰","🐼","🐻","🐯","🦁","🐨"];
+    function pop() {
+      if (popped >= 0) unpop();
+      popped = Math.floor(Math.random() * 9);
+      const cell = grid.children[popped];
+      cell.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      cell.classList.add("whack-active");
+      cell.onclick = () => {
+        hits++;
+        GameRunner.coins += 8;
+        GameRunner.score = hits;
+        floatText("+8", "#4ade80");
+        updateGameHUD();
+        unpop();
+      };
+      const idxCaptured = popped;
+      setTimeout(() => { if (popped === idxCaptured) unpop(); }, 950);
+    }
+    function unpop() {
+      if (popped < 0) return;
+      const cell = grid.children[popped];
+      cell.textContent = "";
+      cell.classList.remove("whack-active");
+      cell.onclick = null;
+      popped = -1;
+    }
+    popTimer = setInterval(pop, 720);
+    GameRunner.onQuit = () => clearInterval(popTimer);
+    gameTimer(60, () => {
+      clearInterval(popTimer);
+      endGame({ win: hits >= 25, coins: GameRunner.coins, title: "🔨 Time's Up!", stats: `Hits: ${hits}` });
+    });
+  }
+};
+
+// ====== 3. MEMORY MATCH ======
+Modes.memory = {
+  start(canvas) {
+    const emojis = ["🐶","🐱","🦊","🐰","🐼","🐻","🐯","🦁"];
+    const cards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:14px">Find all 8 pairs. Bonus for finishing fast.</div>
+      <div class="memory-grid" id="memGrid"></div>
+    `;
+    const grid = $("memGrid");
+    cards.forEach(emoji => {
+      const c = document.createElement("div");
+      c.className = "mem-card";
+      c.dataset.emoji = emoji;
+      c.innerHTML = `<div class="mem-back">?</div><div class="mem-front">${emoji}</div>`;
+      grid.appendChild(c);
+    });
+    let flipped = [], matched = 0, locked = false;
+    grid.querySelectorAll(".mem-card").forEach(card => {
+      card.onclick = () => {
+        if (locked || card.classList.contains("mem-flipped") || card.classList.contains("mem-done")) return;
+        card.classList.add("mem-flipped");
+        flipped.push(card);
+        if (flipped.length === 2) {
+          const [a, b] = flipped;
+          if (a.dataset.emoji === b.dataset.emoji) {
+            a.classList.add("mem-done"); b.classList.add("mem-done");
+            matched++;
+            GameRunner.coins += 20;
+            floatText("Match! +20", "#4ade80");
+            GameRunner.score = matched;
+            flipped = [];
+            updateGameHUD();
+            if (matched === 8) {
+              const bonus = GameRunner.time * 5;
+              endGame({ win: true, coins: GameRunner.coins + bonus, title: "🃏 Perfect Match!", stats: `Time bonus: +${bonus}` });
+            }
+          } else {
+            locked = true;
+            setTimeout(() => {
+              a.classList.remove("mem-flipped");
+              b.classList.remove("mem-flipped");
+              flipped = []; locked = false;
+            }, 700);
+          }
+        }
+      };
+    });
+    gameTimer(90, () => {
+      endGame({ win: matched >= 6, coins: GameRunner.coins, title: "🃏 Time!", stats: `Pairs: ${matched}/8` });
+    });
+  }
+};
+
+// ====== 4. PERFECT AIM ======
+Modes.aim = {
+  start(canvas) {
+    let shots = 10, score = 0, angle = 0, timer;
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:14px">Click FIRE when the crosshair is centered! <span id="aimShots">10</span> shots left.</div>
+      <div class="aim-target" id="aimTarget">
+        <div class="aim-ring aim-ring-outer"></div>
+        <div class="aim-ring aim-ring-mid"></div>
+        <div class="aim-ring aim-ring-inner"></div>
+        <div class="aim-bull"></div>
+        <div class="aim-cross" id="aimCross">✚</div>
+      </div>
+      <div style="text-align:center;margin-top:16px"><button class="big-btn" id="aimFire">FIRE</button></div>
+    `;
+    const cross = $("aimCross");
+    function tick() {
+      angle += 4;
+      const r = 90 + Math.sin(angle * 0.05) * 30;
+      const cx = 150 + r * Math.cos(angle * Math.PI / 180);
+      const cy = 150 + r * Math.sin(angle * Math.PI / 180);
+      cross.style.left = cx + "px";
+      cross.style.top  = cy + "px";
+    }
+    timer = setInterval(tick, 16);
+    $("aimFire").onclick = () => {
+      if (shots <= 0) return;
+      const cx = parseFloat(cross.style.left) || 150;
+      const cy = parseFloat(cross.style.top)  || 150;
+      const dist = Math.hypot(cx - 150, cy - 150);
+      let earned = 0, label = "";
+      if (dist < 20)      { earned = 60; label = "BULLSEYE +60"; }
+      else if (dist < 45) { earned = 30; label = "+30"; }
+      else if (dist < 80) { earned = 10; label = "+10"; }
+      else                { label = "MISS"; }
+      if (earned) { GameRunner.coins += earned; score += earned; }
+      floatText(label, earned ? "#4ade80" : "#ff5470");
+      shots--;
+      $("aimShots").textContent = shots;
+      GameRunner.score = score;
+      updateGameHUD();
+      if (shots <= 0) {
+        clearInterval(timer);
+        endGame({ win: score >= 200, coins: GameRunner.coins, title: "🎯 Shots Done", stats: `Score: ${score}` });
+      }
+    };
+    GameRunner.onQuit = () => clearInterval(timer);
+  }
+};
+
+// ====== 5. BOMB DEFUSE ======
+Modes.defuse = {
+  start(canvas) {
+    const colors = [
+      { name: "RED",    css: "#ff5470" },
+      { name: "BLUE",   css: "#38bdf8" },
+      { name: "GREEN",  css: "#4ade80" },
+      { name: "YELLOW", css: "#ffd93d" }
+    ];
+    let round = 1, correct = 0;
+    canvas.innerHTML = `
+      <div class="defuse-wrap">
+        <div style="font-size:60px;text-align:center">💣</div>
+        <div class="defuse-hint" id="defHint"></div>
+        <div class="defuse-wires" id="defWires"></div>
+        <div style="text-align:center;color:var(--dim);margin-top:12px">
+          Round <span id="defRound">1</span>/10 · Correct: <span id="defScore">0</span>
+        </div>
+      </div>
+    `;
+    function newRound() {
+      const shuffled = colors.slice().sort(() => Math.random() - 0.5);
+      const target = shuffled[Math.floor(Math.random() * shuffled.length)];
+      $("defHint").innerHTML = `Cut every wire <b>EXCEPT</b> the <span style="color:${target.css}">${target.name}</span> one!`;
+      const wires = $("defWires");
+      wires.innerHTML = "";
+      let cutCount = 0;
+      let failed = false;
+      shuffled.forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = "defuse-wire";
+        btn.style.background = c.css;
+        btn.textContent = c.name;
+        btn.onclick = () => {
+          if (failed) return;
+          if (c.name === target.name) { failed = true; floatText("BOOM!", "#ff5470"); nextRound(false); return; }
+          btn.disabled = true; btn.style.opacity = "0.3";
+          cutCount++;
+          if (cutCount === shuffled.length - 1) { nextRound(true); }
+        };
+        wires.appendChild(btn);
+      });
+    }
+    function nextRound(ok) {
+      if (ok) { correct++; GameRunner.coins += 30; floatText("+30", "#4ade80"); }
+      round++;
+      $("defRound").textContent = Math.min(round, 10);
+      $("defScore").textContent = correct;
+      GameRunner.score = correct;
+      updateGameHUD();
+      if (round > 10) {
+        const bonus = correct === 10 ? 100 : 0;
+        endGame({ win: correct >= 7, coins: GameRunner.coins + bonus, title: correct === 10 ? "💣 Perfect Defuse!" : "💣 Complete", stats: `Correct: ${correct}/10 · Bonus: +${bonus}` });
+      } else {
+        setTimeout(newRound, 500);
       }
     }
     newRound();
+  }
+};
 
-    function finish() {
-      endGame({
-        win: score >= 60,
-        coins: Math.max(0, GameRunner.coins),
-        title: score >= 100 ? "🥞 Dragon Feasted!" : "Feast Over",
-        stats: `Score: ${score}`
+// ====== 6. DICE DUEL ======
+Modes.dice = {
+  start(canvas) {
+    const faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
+    let current = Math.floor(Math.random() * 6) + 1;
+    let streak = 0, wrongs = 0;
+    canvas.innerHTML = `
+      <div class="dice-wrap">
+        <div class="dice-current" id="diceCur">${faces[current-1]}</div>
+        <div style="text-align:center;margin:14px 0;color:var(--dim)">
+          Will the next roll be HIGHER or LOWER than <b id="diceCurVal">${current}</b>?
+        </div>
+        <div class="dice-buttons">
+          <button class="big-btn" id="diceHi">⬆ HIGHER</button>
+          <button class="big-btn secondary" id="diceLo">⬇ LOWER</button>
+        </div>
+        <div style="text-align:center;margin-top:14px;color:var(--dim)">
+          Streak: <span id="diceStreak">0</span> · Wrongs: <span id="diceWr">0</span>/3
+        </div>
+      </div>
+    `;
+    function guess(kind) {
+      const next = Math.floor(Math.random() * 6) + 1;
+      $("diceCur").textContent = faces[next-1];
+      const ok = (kind === "hi" && next > current) || (kind === "lo" && next < current);
+      if (next === current) {
+        floatText("Same! Free roll", "#ffd93d");
+      } else if (ok) {
+        streak++;
+        const earn = 10 * streak;
+        GameRunner.coins += earn;
+        GameRunner.score = streak;
+        floatText("+" + earn, "#4ade80");
+      } else {
+        wrongs++;
+        streak = 0;
+        floatText("Wrong!", "#ff5470");
+      }
+      current = next;
+      $("diceCurVal").textContent = current;
+      $("diceStreak").textContent = streak;
+      $("diceWr").textContent = wrongs;
+      updateGameHUD();
+      if (wrongs >= 3) {
+        endGame({ win: GameRunner.coins >= 100, coins: GameRunner.coins, title: "🎲 Game Over", stats: `Best streak: ${GameRunner.score}` });
+      }
+    }
+    $("diceHi").onclick = () => guess("hi");
+    $("diceLo").onclick = () => guess("lo");
+  }
+};
+
+// ====== 7. TRAFFIC DODGE ======
+Modes.dodge = {
+  start(canvas) {
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:14px">
+        Tap a lane to move your car. Dodge everything!
+      </div>
+      <div class="dodge-road" id="dodgeRoad">
+        <div class="dodge-lane" data-l="0"></div>
+        <div class="dodge-lane" data-l="1"></div>
+        <div class="dodge-lane" data-l="2"></div>
+        <div id="dodgePlayer" class="dodge-player">🚗</div>
+      </div>
+    `;
+    let lane = 1;
+    const player = $("dodgePlayer");
+    player.style.left = "50%";
+    document.querySelectorAll(".dodge-lane").forEach(l => {
+      l.onclick = () => {
+        const target = parseInt(l.dataset.l);
+        lane = target;
+        player.style.left = (16.6 + target * 33.3) + "%";
+      };
+    });
+    const road = $("dodgeRoad");
+    const obstacles = [];
+    const spawn = setInterval(() => {
+      const o = document.createElement("div");
+      o.className = "dodge-obs";
+      o.textContent = ["🚧","🔺","💣","🕳️","🌵"][Math.floor(Math.random()*5)];
+      const laneIdx = Math.floor(Math.random() * 3);
+      o.style.left = (16.6 + laneIdx * 33.3) + "%";
+      o.style.top = "-40px";
+      o.dataset.lane = laneIdx;
+      road.appendChild(o);
+      obstacles.push({ el: o, y: -40, lane: laneIdx });
+    }, 700);
+    const move = setInterval(() => {
+      obstacles.forEach(ob => {
+        ob.y += 6;
+        ob.el.style.top = ob.y + "px";
+        if (ob.y > 380 && !ob.passed) {
+          ob.passed = true;
+          GameRunner.coins += 5;
+          updateGameHUD();
+        }
+        if (ob.y > 300 && ob.y < 360 && ob.lane === lane) {
+          floatText("CRASH!", "#ff5470");
+          stop();
+        }
+        if (ob.y > 500) { ob.el.remove(); }
+      });
+    }, 30);
+    function stop() {
+      clearInterval(spawn); clearInterval(move);
+      obstacles.forEach(o => o.el.remove());
+      endGame({ win: false, coins: GameRunner.coins, title: "🚗 Crashed!", stats: `Coins earned: ${GameRunner.coins}` });
+    }
+    GameRunner.onQuit = () => { clearInterval(spawn); clearInterval(move); };
+    gameTimer(60, () => {
+      clearInterval(spawn); clearInterval(move);
+      endGame({ win: true, coins: GameRunner.coins + 80, title: "🚗 You Survived!", stats: `Bonus: +80` });
+    });
+  }
+};
+
+// ====== 8. SIMON SAYS ======
+Modes.simon = {
+  start(canvas) {
+    const colors = ["#ff5470","#38bdf8","#4ade80","#ffd93d"];
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:14px">
+        Watch the sequence, then repeat it. Adds one every round.
+      </div>
+      <div class="simon-grid" id="simonGrid">
+        ${colors.map((c,i)=>`<button class="simon-btn" data-i="${i}" style="background:${c}"></button>`).join("")}
+      </div>
+      <div style="text-align:center;margin-top:14px" id="simonStatus">Get ready...</div>
+    `;
+    let seq = [], userIdx = 0, playing = false;
+    function flash(i) {
+      return new Promise(res => {
+        const b = document.querySelector(`.simon-btn[data-i="${i}"]`);
+        b.classList.add("simon-lit");
+        setTimeout(() => { b.classList.remove("simon-lit"); res(); }, 420);
       });
     }
+    async function playSeq() {
+      playing = true;
+      $("simonStatus").textContent = "Watch...";
+      for (const i of seq) {
+        await flash(i);
+        await new Promise(r => setTimeout(r, 120));
+      }
+      playing = false;
+      userIdx = 0;
+      $("simonStatus").textContent = "Your turn!";
+    }
+    function next() {
+      seq.push(Math.floor(Math.random() * 4));
+      GameRunner.score = seq.length - 1;
+      updateGameHUD();
+      setTimeout(playSeq, 500);
+    }
+    document.querySelectorAll(".simon-btn").forEach(b => {
+      b.onclick = async () => {
+        if (playing) return;
+        const i = parseInt(b.dataset.i);
+        await flash(i);
+        if (i === seq[userIdx]) {
+          userIdx++;
+          if (userIdx === seq.length) {
+            const earn = seq.length * 15;
+            GameRunner.coins += earn;
+            floatText("+" + earn, "#4ade80");
+            updateGameHUD();
+            next();
+          }
+        } else {
+          floatText("Wrong!", "#ff5470");
+          endGame({ win: seq.length >= 5, coins: GameRunner.coins, title: "🧠 Sequence Broken", stats: `Reached: ${seq.length - 1} steps` });
+        }
+      };
+    });
+    next();
+  }
+};
+
+// ====== 9. REACTION TEST ======
+Modes.react = {
+  start(canvas) {
+    let round = 1, totalMs = 0;
+    canvas.innerHTML = `
+      <div class="react-wrap" id="reactWrap">
+        <div class="react-status" id="reactStatus">Wait for green...</div>
+        <div class="react-time" id="reactTime">—</div>
+        <div class="react-round">Round <span id="reactR">1</span>/5</div>
+      </div>
+    `;
+    const wrap = $("reactWrap");
+    let waitTimer, startTime, state = "waiting";
+    function begin() {
+      wrap.classList.remove("react-go","react-clicked");
+      wrap.classList.add("react-red");
+      $("reactStatus").textContent = "Wait...";
+      $("reactTime").textContent = "—";
+      state = "waiting";
+      const delay = 1500 + Math.random() * 3000;
+      waitTimer = setTimeout(() => {
+        wrap.classList.remove("react-red");
+        wrap.classList.add("react-go");
+        $("reactStatus").textContent = "GO! Tap!";
+        startTime = Date.now();
+        state = "go";
+      }, delay);
+    }
+    wrap.onclick = () => {
+      if (state === "waiting") {
+        clearTimeout(waitTimer);
+        $("reactStatus").textContent = "Too early!";
+        totalMs += 1000;
+        setTimeout(nextRound, 900);
+      } else if (state === "go") {
+        const ms = Date.now() - startTime;
+        totalMs += ms;
+        $("reactTime").textContent = ms + " ms";
+        wrap.classList.remove("react-go");
+        wrap.classList.add("react-clicked");
+        const earn = Math.max(0, Math.round((500 - ms) * 0.3));
+        if (earn > 0) { GameRunner.coins += earn; floatText("+" + earn, "#4ade80"); updateGameHUD(); }
+        state = "done";
+        setTimeout(nextRound, 900);
+      }
+    };
+    function nextRound() {
+      if (round >= 5) {
+        const avg = Math.round(totalMs / 5);
+        GameRunner.score = avg;
+        updateGameHUD();
+        endGame({ win: avg < 350, coins: GameRunner.coins, title: "⚡ Reaction Done", stats: `Average: ${avg} ms` });
+        return;
+      }
+      round++;
+      $("reactR").textContent = round;
+      begin();
+    }
+    begin();
+    GameRunner.onQuit = () => clearTimeout(waitTimer);
+  }
+};
+
+// ====== 10. COLOR RUSH ======
+Modes.color = {
+  start(canvas) {
+    const colors = [
+      { css: "#ff5470", key: "red"    },
+      { css: "#38bdf8", key: "blue"   },
+      { css: "#4ade80", key: "green"  },
+      { css: "#ffd93d", key: "yellow" }
+    ];
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:10px">
+        Tap the color slot that matches each falling buddy before it hits the ground!
+      </div>
+      <div class="color-field" id="colorField"></div>
+      <div class="color-slots" id="colorSlots"></div>
+    `;
+    const field = $("colorField");
+    const slots = $("colorSlots");
+    colors.forEach(c => {
+      const s = document.createElement("button");
+      s.className = "color-slot";
+      s.style.background = c.css;
+      s.dataset.key = c.key;
+      slots.appendChild(s);
+    });
+    const falling = [];
+    function spawn() {
+      const c = colors[Math.floor(Math.random() * colors.length)];
+      const el = document.createElement("div");
+      el.className = "color-buddy";
+      el.textContent = "🐰";
+      el.style.color = c.css;
+      el.style.left = (20 + Math.random() * 60) + "%";
+      el.style.top = "-40px";
+      el.dataset.key = c.key;
+      field.appendChild(el);
+      falling.push({ el, y: -40, key: c.key });
+    }
+    const sp = setInterval(spawn, 800);
+    const mv = setInterval(() => {
+      falling.forEach(f => {
+        if (f.dead) return;
+        f.y += 4;
+        f.el.style.top = f.y + "px";
+        if (f.y > 320) { f.dead = true; f.el.remove(); floatText("Missed!", "#ff5470"); }
+      });
+    }, 30);
+    slots.querySelectorAll(".color-slot").forEach(s => {
+      s.onclick = () => {
+        const key = s.dataset.key;
+        const target = falling.find(f => !f.dead && f.y > 100 && f.key === key);
+        if (target) {
+          target.dead = true;
+          target.el.remove();
+          GameRunner.coins += 12;
+          GameRunner.score++;
+          floatText("+12", "#4ade80");
+          updateGameHUD();
+        } else {
+          floatText("Miss!", "#ff5470");
+        }
+      };
+    });
+    GameRunner.onQuit = () => { clearInterval(sp); clearInterval(mv); };
+    gameTimer(60, () => {
+      clearInterval(sp); clearInterval(mv);
+      falling.forEach(f => f.el.remove());
+      endGame({ win: GameRunner.score >= 25, coins: GameRunner.coins, title: "🎨 Time!", stats: `Matches: ${GameRunner.score}` });
+    });
   }
 };
 
