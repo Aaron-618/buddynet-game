@@ -2292,7 +2292,7 @@ Modes.slice = {
       const dir = Math.random() < 0.5 ? 1 : -1;
       const startX = dir === 1 ? -40 : field.offsetWidth + 40;
       const targetY = 100 + Math.random() * 150;
-      const obj = { el, x: startX, y: 0, vx: dir * (4 + Math.random() * 3), vy: -14 - Math.random() * 4, gravity: 0.4, bomb: isBomb, sliced: false };
+      const obj = { el, x: startX, y: 0, vx: dir * (1.8 + Math.random() * 1.2), vy: -10 - Math.random() * 2, gravity: 0.22, bomb: isBomb, sliced: false };
       el.style.left = startX + "px";
       field.appendChild(el);
       el.onclick = e => {
