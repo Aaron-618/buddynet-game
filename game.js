@@ -1970,7 +1970,7 @@ function bigPop(text, color = "#ffd93d") {
 Modes.blast = {
   start(canvas) {
     const COLS = 7, ROWS = 8;
-    const emojis = ["🐶","🐱","🦊","🐰","🐼"];
+    const emojis = ["🔴","🟠","🟡","🟢","🔵"];
     let grid = [];
     let combo = 0, comboTimer;
     canvas.innerHTML = `
