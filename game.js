@@ -1841,16 +1841,16 @@ function setupNav() {
 // ===========================================================
 
 const GAME_MODES = [
-  { id: "reel",   emoji: "🎣", name: "Reel It In",    desc: "Cast the line, stop the bobber in the green zone." },
-  { id: "whack",  emoji: "🔨", name: "Whack Attack",  desc: "3×3 grid. Tap buddies before they duck. 60 seconds." },
-  { id: "memory", emoji: "🃏", name: "Memory Match",  desc: "Flip cards, find matching pairs before time runs out." },
-  { id: "aim",    emoji: "🎯", name: "Perfect Aim",   desc: "Fire when the crosshair hits dead center. 10 shots." },
-  { id: "defuse", emoji: "💣", name: "Bomb Defuse",   desc: "Cut every wire except the target color." },
-  { id: "dice",   emoji: "🎲", name: "Dice Duel",     desc: "Higher or lower? Extend your streak, 3 wrong = end." },
-  { id: "dodge",  emoji: "🚗", name: "Traffic Dodge", desc: "Swap lanes to dodge falling obstacles. Survive 60s." },
-  { id: "simon",  emoji: "🧠", name: "Simon Says",    desc: "Watch the sequence, repeat it. Grows every round." },
-  { id: "react",  emoji: "⚡", name: "Reaction Test", desc: "Wait for green, then tap fast. Best of 5." },
-  { id: "color",  emoji: "🎨", name: "Color Rush",    desc: "Tap the matching color slot before each falling buddy hits the ground." }
+  { id: "blast",   emoji: "💥", name: "Blast Combo",     desc: "Tap groups of 3+ same buddies to blast them. Chain combos for huge multipliers." },
+  { id: "slots",   emoji: "🎰", name: "Jackpot Slots",   desc: "Spin the reels. Match 3 to win. Triple 7s = MEGA JACKPOT." },
+  { id: "snake",   emoji: "🐍", name: "Snake",           desc: "Classic snake. Eat coins, don't hit yourself or the walls." },
+  { id: "jumper",  emoji: "🦘", name: "Sky Jumper",      desc: "Auto-jumping buddy. Tap sides to steer, land on platforms, climb higher." },
+  { id: "slice",   emoji: "🥷", name: "Slice Rush",      desc: "Buddies fly across the screen — swipe or tap fast to slice them. Miss = penalty." },
+  { id: "break",   emoji: "🏓", name: "Buddy Break",     desc: "Paddle + bouncing ball. Smash all the blocks. Powerups appear." },
+  { id: "beat",    emoji: "🎵", name: "Tap Beat",        desc: "Notes fall down 4 lanes. Tap when they hit the line. Combos multiply." },
+  { id: "dig",     emoji: "💣", name: "Lucky Dig",       desc: "Reveal tiles for coins. Numbers hint at nearby bombs. Cash out or push your luck." },
+  { id: "sniper",  emoji: "🎯", name: "Target Sniper",   desc: "Targets pop up all over. Click as fast as you can. Perfect shots = bullseye." },
+  { id: "punch",   emoji: "👊", name: "Combo Punch",     desc: "Boss health bar. Tap the shown direction — chain the combo without missing to nuke the boss." }
 ];
 
 const Modes = {};
@@ -1933,583 +1933,730 @@ function endGame({ win, title, coins, stats }) {
   $("gameResult").classList.add("show");
 }
 
-// ====== 1. REEL IT IN ======
-Modes.reel = {
+// ---------- SHARED GAME JUICE ----------
+function screenShake(el, intensity = 6) {
+  if (!el) return;
+  el.style.animation = "none";
+  void el.offsetWidth;
+  el.style.animation = `screenShake 0.3s`;
+}
+function popParticles(x, y, count = 8, color = "#ffd93d") {
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("div");
+    p.className = "juice-particle";
+    p.style.left = x + "px";
+    p.style.top  = y + "px";
+    p.style.background = color;
+    const angle = (i / count) * Math.PI * 2;
+    const dist = 40 + Math.random() * 30;
+    p.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+    p.style.setProperty("--dy", Math.sin(angle) * dist + "px");
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
+}
+function bigPop(text, color = "#ffd93d") {
+  const t = document.createElement("div");
+  t.className = "juice-bigpop";
+  t.textContent = text;
+  t.style.color = color;
+  t.style.left = window.innerWidth / 2 + "px";
+  t.style.top = window.innerHeight / 2 + "px";
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 900);
+}
+
+// ====== 1. BLAST COMBO ======
+Modes.blast = {
   start(canvas) {
+    const COLS = 7, ROWS = 8;
+    const emojis = ["🐶","🐱","🦊","🐰","🐼"];
+    let grid = [];
+    let combo = 0, comboTimer;
     canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:14px">
-        Tap CAST to launch the bobber. Tap STOP when it's in the <span style="color:#4ade80">green zone</span>!
+      <div style="text-align:center;color:var(--dim);margin-bottom:6px">
+        Tap groups of 3+ matching buddies to blast them. Combo streak = huge coins!
       </div>
-      <div class="reel-wrap">
-        <div class="reel-bar"><div class="reel-green"></div><div id="reelBobber" class="reel-bobber">🎣</div></div>
-      </div>
-      <div style="text-align:center;margin-top:14px;color:var(--dim)">
-        Casts left: <span id="reelCasts">10</span> · Caught: <span id="reelCaught">0</span>
-      </div>
-      <div style="text-align:center;margin-top:16px"><button class="big-btn" id="reelBtn">CAST</button></div>
+      <div id="blastCombo" class="blast-combo">Combo: 0x</div>
+      <div class="blast-board" id="blastBoard"></div>
     `;
-    let casts = 10, caught = 0, moving = false, dir = 1, pos = 0, timer;
-    const bobber = $("reelBobber");
-    function tick() {
-      pos += dir * 1.8;
-      if (pos >= 100) { pos = 100; dir = -1; }
-      if (pos <= 0)   { pos = 0;   dir = 1; }
-      bobber.style.left = pos + "%";
-    }
-    $("reelBtn").onclick = () => {
-      if (moving) {
-        moving = false; clearInterval(timer);
-        const perfect = pos >= 45 && pos <= 55;
-        const hit = pos >= 38 && pos <= 62;
-        if (perfect) { caught++; GameRunner.coins += 50; floatText("PERFECT +50", "#ffd93d"); }
-        else if (hit) { caught++; GameRunner.coins += 25; floatText("+25", "#4ade80"); }
-        else { floatText("Miss!", "#ff5470"); }
-        casts--;
-        $("reelCasts").textContent = casts;
-        $("reelCaught").textContent = caught;
-        GameRunner.score = caught;
-        updateGameHUD();
-        $("reelBtn").textContent = "CAST";
-        if (casts <= 0) {
-          const bonus = caught >= 8 ? 100 : (caught >= 5 ? 30 : 0);
-          endGame({ win: caught >= 5, coins: GameRunner.coins + bonus, title: "🎣 Fishing Done", stats: `Caught: ${caught}/10 · Bonus: +${bonus}` });
-        }
-      } else {
-        moving = true; pos = 0; dir = 1;
-        timer = setInterval(tick, 14);
-        $("reelBtn").textContent = "STOP!";
+    const board = $("blastBoard");
+    board.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+    function newCell() { return emojis[Math.floor(Math.random() * emojis.length)]; }
+    function render() {
+      board.innerHTML = "";
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+        const cell = document.createElement("div");
+        cell.className = "blast-cell";
+        cell.textContent = grid[r][c];
+        cell.dataset.r = r; cell.dataset.c = c;
+        cell.onclick = e => handleClick(r, c, e);
+        board.appendChild(cell);
       }
-    };
-    GameRunner.onQuit = () => clearInterval(timer);
-  }
-};
-
-// ====== 2. WHACK ATTACK ======
-Modes.whack = {
-  start(canvas) {
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:14px">Tap buddies as they pop up. Under 1 second each!</div>
-      <div class="whack-grid" id="whackGrid"></div>
-    `;
-    const grid = $("whackGrid");
-    for (let i = 0; i < 9; i++) {
-      const c = document.createElement("div");
-      c.className = "whack-cell";
-      c.dataset.i = i;
-      grid.appendChild(c);
     }
-    let hits = 0, popped = -1, popTimer;
-    const emojis = ["🐶","🐱","🦊","🐰","🐼","🐻","🐯","🦁","🐨"];
-    function pop() {
-      if (popped >= 0) unpop();
-      popped = Math.floor(Math.random() * 9);
-      const cell = grid.children[popped];
-      cell.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      cell.classList.add("whack-active");
-      cell.onclick = () => {
-        hits++;
-        GameRunner.coins += 8;
-        GameRunner.score = hits;
-        floatText("+8", "#4ade80");
-        updateGameHUD();
-        unpop();
-      };
-      const idxCaptured = popped;
-      setTimeout(() => { if (popped === idxCaptured) unpop(); }, 950);
+    function initGrid() {
+      grid = Array(ROWS).fill(0).map(() => Array(COLS).fill(0).map(newCell));
     }
-    function unpop() {
-      if (popped < 0) return;
-      const cell = grid.children[popped];
-      cell.textContent = "";
-      cell.classList.remove("whack-active");
-      cell.onclick = null;
-      popped = -1;
+    function findGroup(r, c, target, visited) {
+      const stack = [[r, c]];
+      const result = [];
+      while (stack.length) {
+        const [rr, cc] = stack.pop();
+        const key = rr + "," + cc;
+        if (visited.has(key)) continue;
+        if (rr < 0 || rr >= ROWS || cc < 0 || cc >= COLS) continue;
+        if (grid[rr][cc] !== target) continue;
+        visited.add(key);
+        result.push([rr, cc]);
+        stack.push([rr-1,cc],[rr+1,cc],[rr,cc-1],[rr,cc+1]);
+      }
+      return result;
     }
-    popTimer = setInterval(pop, 720);
-    GameRunner.onQuit = () => clearInterval(popTimer);
-    gameTimer(60, () => {
-      clearInterval(popTimer);
-      endGame({ win: hits >= 25, coins: GameRunner.coins, title: "🔨 Time's Up!", stats: `Hits: ${hits}` });
-    });
-  }
-};
-
-// ====== 3. MEMORY MATCH ======
-Modes.memory = {
-  start(canvas) {
-    const emojis = ["🐶","🐱","🦊","🐰","🐼","🐻","🐯","🦁"];
-    const cards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:14px">Find all 8 pairs. Bonus for finishing fast.</div>
-      <div class="memory-grid" id="memGrid"></div>
-    `;
-    const grid = $("memGrid");
-    cards.forEach(emoji => {
-      const c = document.createElement("div");
-      c.className = "mem-card";
-      c.dataset.emoji = emoji;
-      c.innerHTML = `<div class="mem-back">?</div><div class="mem-front">${emoji}</div>`;
-      grid.appendChild(c);
-    });
-    let flipped = [], matched = 0, locked = false;
-    grid.querySelectorAll(".mem-card").forEach(card => {
-      card.onclick = () => {
-        if (locked || card.classList.contains("mem-flipped") || card.classList.contains("mem-done")) return;
-        card.classList.add("mem-flipped");
-        flipped.push(card);
-        if (flipped.length === 2) {
-          const [a, b] = flipped;
-          if (a.dataset.emoji === b.dataset.emoji) {
-            a.classList.add("mem-done"); b.classList.add("mem-done");
-            matched++;
-            GameRunner.coins += 20;
-            floatText("Match! +20", "#4ade80");
-            GameRunner.score = matched;
-            flipped = [];
-            updateGameHUD();
-            if (matched === 8) {
-              const bonus = GameRunner.time * 5;
-              endGame({ win: true, coins: GameRunner.coins + bonus, title: "🃏 Perfect Match!", stats: `Time bonus: +${bonus}` });
-            }
-          } else {
-            locked = true;
-            setTimeout(() => {
-              a.classList.remove("mem-flipped");
-              b.classList.remove("mem-flipped");
-              flipped = []; locked = false;
-            }, 700);
-          }
-        }
-      };
-    });
-    gameTimer(90, () => {
-      endGame({ win: matched >= 6, coins: GameRunner.coins, title: "🃏 Time!", stats: `Pairs: ${matched}/8` });
-    });
-  }
-};
-
-// ====== 4. PERFECT AIM ======
-Modes.aim = {
-  start(canvas) {
-    let shots = 10, score = 0, angle = 0, timer;
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:14px">Click FIRE when the crosshair is centered! <span id="aimShots">10</span> shots left.</div>
-      <div class="aim-target" id="aimTarget">
-        <div class="aim-ring aim-ring-outer"></div>
-        <div class="aim-ring aim-ring-mid"></div>
-        <div class="aim-ring aim-ring-inner"></div>
-        <div class="aim-bull"></div>
-        <div class="aim-cross" id="aimCross">✚</div>
-      </div>
-      <div style="text-align:center;margin-top:16px"><button class="big-btn" id="aimFire">FIRE</button></div>
-    `;
-    const cross = $("aimCross");
-    function tick() {
-      angle += 4;
-      const r = 90 + Math.sin(angle * 0.05) * 30;
-      const cx = 150 + r * Math.cos(angle * Math.PI / 180);
-      const cy = 150 + r * Math.sin(angle * Math.PI / 180);
-      cross.style.left = cx + "px";
-      cross.style.top  = cy + "px";
-    }
-    timer = setInterval(tick, 16);
-    $("aimFire").onclick = () => {
-      if (shots <= 0) return;
-      const cx = parseFloat(cross.style.left) || 150;
-      const cy = parseFloat(cross.style.top)  || 150;
-      const dist = Math.hypot(cx - 150, cy - 150);
-      let earned = 0, label = "";
-      if (dist < 20)      { earned = 60; label = "BULLSEYE +60"; }
-      else if (dist < 45) { earned = 30; label = "+30"; }
-      else if (dist < 80) { earned = 10; label = "+10"; }
-      else                { label = "MISS"; }
-      if (earned) { GameRunner.coins += earned; score += earned; }
-      floatText(label, earned ? "#4ade80" : "#ff5470");
-      shots--;
-      $("aimShots").textContent = shots;
-      GameRunner.score = score;
+    function handleClick(r, c, e) {
+      const group = findGroup(r, c, grid[r][c], new Set());
+      if (group.length < 3) { floatText("Need 3+", "#ff5470"); return; }
+      combo++;
+      const base = group.length * 8;
+      const earned = base * combo;
+      GameRunner.coins += earned;
+      GameRunner.score += group.length;
+      const cx = e.clientX, cy = e.clientY;
+      popParticles(cx, cy, group.length * 2, "#ffd93d");
+      bigPop((combo > 1 ? "x" + combo + "  " : "") + "+" + earned, combo > 3 ? "#ff6b9d" : "#ffd93d");
+      screenShake(document.body);
+      group.forEach(([rr, cc]) => grid[rr][cc] = null);
+      // gravity
+      for (let c = 0; c < COLS; c++) {
+        const col = [];
+        for (let r = ROWS - 1; r >= 0; r--) if (grid[r][c]) col.push(grid[r][c]);
+        for (let r = ROWS - 1; r >= 0; r--) grid[r][c] = col[ROWS - 1 - r] || newCell();
+      }
+      render();
+      $("blastCombo").textContent = "Combo: " + combo + "x";
       updateGameHUD();
-      if (shots <= 0) {
-        clearInterval(timer);
-        endGame({ win: score >= 200, coins: GameRunner.coins, title: "🎯 Shots Done", stats: `Score: ${score}` });
-      }
-    };
-    GameRunner.onQuit = () => clearInterval(timer);
+      clearTimeout(comboTimer);
+      comboTimer = setTimeout(() => { combo = 0; $("blastCombo").textContent = "Combo: 0x"; }, 2000);
+    }
+    initGrid(); render();
+    gameTimer(60, () => endGame({ win: GameRunner.coins >= 400, coins: GameRunner.coins, title: "💥 BLAST OVER!", stats: `Score: ${GameRunner.score}` }));
   }
 };
 
-// ====== 5. BOMB DEFUSE ======
-Modes.defuse = {
+// ====== 2. JACKPOT SLOTS ======
+Modes.slots = {
   start(canvas) {
-    const colors = [
-      { name: "RED",    css: "#ff5470" },
-      { name: "BLUE",   css: "#38bdf8" },
-      { name: "GREEN",  css: "#4ade80" },
-      { name: "YELLOW", css: "#ffd93d" }
-    ];
-    let round = 1, correct = 0;
+    const symbols = ["🍒","🔔","💎","⭐","7️⃣","🎰","🐶"];
+    let spinsLeft = 15;
     canvas.innerHTML = `
-      <div class="defuse-wrap">
-        <div style="font-size:60px;text-align:center">💣</div>
-        <div class="defuse-hint" id="defHint"></div>
-        <div class="defuse-wires" id="defWires"></div>
-        <div style="text-align:center;color:var(--dim);margin-top:12px">
-          Round <span id="defRound">1</span>/10 · Correct: <span id="defScore">0</span>
+      <div class="slots-wrap">
+        <div class="slots-title">🎰 JACKPOT SLOTS 🎰</div>
+        <div class="slots-reels">
+          <div class="slots-reel" id="reel0">🎰</div>
+          <div class="slots-reel" id="reel1">🎰</div>
+          <div class="slots-reel" id="reel2">🎰</div>
+        </div>
+        <div class="slots-status" id="slotStatus">Pull the lever!</div>
+        <div style="text-align:center;margin-top:10px;color:var(--dim)">Spins left: <span id="slotsLeft">15</span></div>
+        <div style="text-align:center;margin-top:14px"><button class="big-btn" id="slotsBtn">🎰 SPIN 🎰</button></div>
+        <div style="text-align:center;margin-top:10px;color:var(--dim);font-size:11px">
+          Any match: +50 · 7️⃣7️⃣7️⃣ MEGA: +1000 · 💎💎💎 DIAMOND: +500
         </div>
       </div>
     `;
-    function newRound() {
-      const shuffled = colors.slice().sort(() => Math.random() - 0.5);
-      const target = shuffled[Math.floor(Math.random() * shuffled.length)];
-      $("defHint").innerHTML = `Cut every wire <b>EXCEPT</b> the <span style="color:${target.css}">${target.name}</span> one!`;
-      const wires = $("defWires");
-      wires.innerHTML = "";
-      let cutCount = 0;
-      let failed = false;
-      shuffled.forEach(c => {
-        const btn = document.createElement("button");
-        btn.className = "defuse-wire";
-        btn.style.background = c.css;
-        btn.textContent = c.name;
-        btn.onclick = () => {
-          if (failed) return;
-          if (c.name === target.name) { failed = true; floatText("BOOM!", "#ff5470"); nextRound(false); return; }
-          btn.disabled = true; btn.style.opacity = "0.3";
-          cutCount++;
-          if (cutCount === shuffled.length - 1) { nextRound(true); }
-        };
-        wires.appendChild(btn);
+    $("slotsBtn").onclick = () => {
+      if (spinsLeft <= 0) return;
+      spinsLeft--;
+      $("slotsLeft").textContent = spinsLeft;
+      $("slotsBtn").disabled = true;
+      const finals = [0,1,2].map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+      [0,1,2].forEach((i, k) => {
+        const el = $("reel" + i);
+        let ticks = 15 + i * 8;
+        const spin = setInterval(() => {
+          el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+          ticks--;
+          if (ticks <= 0) {
+            clearInterval(spin);
+            el.textContent = finals[i];
+            el.classList.add("slots-land");
+            setTimeout(() => el.classList.remove("slots-land"), 400);
+            if (i === 2) checkResult();
+          }
+        }, 60);
+      });
+      function checkResult() {
+        const [a,b,c] = finals;
+        let win = 0, msg = "No match. Try again!";
+        if (a === b && b === c) {
+          if (a === "7️⃣")      { win = 1000; msg = "💰💰💰 MEGA JACKPOT!"; }
+          else if (a === "💎") { win = 500;  msg = "💎 DIAMOND WIN!"; }
+          else if (a === "⭐") { win = 300;  msg = "⭐ STAR TRIPLE!"; }
+          else                  { win = 150;  msg = "TRIPLE MATCH!"; }
+        } else if (a === b || b === c || a === c) {
+          win = 30; msg = "Double! +30";
+        }
+        if (win) {
+          GameRunner.coins += win;
+          GameRunner.score += win;
+          bigPop("+" + win, win >= 500 ? "#ff6b9d" : "#ffd93d");
+          popParticles(window.innerWidth/2, 240, 16, "#ffd93d");
+          screenShake(document.body);
+        }
+        $("slotStatus").textContent = msg;
+        updateGameHUD();
+        $("slotsBtn").disabled = false;
+        if (spinsLeft <= 0) {
+          endGame({ win: GameRunner.coins >= 300, coins: GameRunner.coins, title: "🎰 Casino Closed", stats: `Best: +${Math.max(0, GameRunner.coins)}` });
+        }
+      }
+    };
+  }
+};
+
+// ====== 3. SNAKE ======
+Modes.snake = {
+  start(canvas) {
+    const CELL = 20, COLS = 20, ROWS = 20;
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:8px">
+        Arrow keys or tap edges. Eat 🍎 = +10. Don't hit yourself!
+      </div>
+      <div class="snake-board" id="snakeBoard" style="width:${COLS*CELL}px;height:${ROWS*CELL}px"></div>
+    `;
+    const board = $("snakeBoard");
+    let snake = [[10,10],[10,9],[10,8]];
+    let dir = [0, 1];
+    let food = [5, 5];
+    function place() {
+      food = [Math.floor(Math.random()*ROWS), Math.floor(Math.random()*COLS)];
+      if (snake.some(([r,c]) => r === food[0] && c === food[1])) place();
+    }
+    function draw() {
+      board.innerHTML = "";
+      snake.forEach(([r,c], i) => {
+        const d = document.createElement("div");
+        d.className = "snake-seg" + (i === 0 ? " snake-head" : "");
+        d.style.left = c*CELL + "px";
+        d.style.top = r*CELL + "px";
+        d.style.width = d.style.height = CELL + "px";
+        board.appendChild(d);
+      });
+      const f = document.createElement("div");
+      f.className = "snake-food";
+      f.style.left = food[1]*CELL + "px";
+      f.style.top = food[0]*CELL + "px";
+      f.textContent = "🍎";
+      board.appendChild(f);
+    }
+    function step() {
+      const [hr, hc] = snake[0];
+      const [dr, dc] = dir;
+      const nr = hr + dr, nc = hc + dc;
+      if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) return die();
+      if (snake.some(([r,c]) => r === nr && c === nc)) return die();
+      snake.unshift([nr, nc]);
+      if (nr === food[0] && nc === food[1]) {
+        GameRunner.coins += 10;
+        GameRunner.score++;
+        floatText("+10", "#4ade80");
+        popParticles(window.innerWidth/2, window.innerHeight/2, 6, "#ff5470");
+        place();
+      } else {
+        snake.pop();
+      }
+      updateGameHUD();
+      draw();
+    }
+    function die() {
+      clearInterval(timer);
+      screenShake(document.body, 12);
+      endGame({ win: GameRunner.score >= 10, coins: GameRunner.coins, title: "🐍 Game Over", stats: `Length: ${snake.length}` });
+    }
+    document.addEventListener("keydown", keyHandler);
+    function keyHandler(e) {
+      if (e.key === "ArrowUp"    && dir[0] !==  1) dir = [-1, 0];
+      if (e.key === "ArrowDown"  && dir[0] !== -1) dir = [ 1, 0];
+      if (e.key === "ArrowLeft"  && dir[1] !==  1) dir = [ 0,-1];
+      if (e.key === "ArrowRight" && dir[1] !== -1) dir = [ 0, 1];
+    }
+    board.onclick = (e) => {
+      const rect = board.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      const cx = rect.width/2, cy = rect.height/2;
+      if (Math.abs(x - cx) > Math.abs(y - cy)) {
+        if (x > cx && dir[1] !== -1) dir = [0, 1];
+        else if (x < cx && dir[1] !== 1) dir = [0, -1];
+      } else {
+        if (y > cy && dir[0] !== -1) dir = [1, 0];
+        else if (y < cy && dir[0] !== 1) dir = [-1, 0];
+      }
+    };
+    place(); draw();
+    const timer = setInterval(step, 130);
+    GameRunner.onQuit = () => { clearInterval(timer); document.removeEventListener("keydown", keyHandler); };
+  }
+};
+
+// ====== 4. SKY JUMPER ======
+Modes.jumper = {
+  start(canvas) {
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:6px">
+        Tap left/right to steer. Land on platforms to climb!
+      </div>
+      <div class="jumper-field" id="jumperField">
+        <div class="jumper-buddy" id="jumperBuddy">🐰</div>
+      </div>
+      <div style="text-align:center;margin-top:6px;color:var(--dim)">Height: <span id="jumperH">0</span> m</div>
+    `;
+    const field = $("jumperField");
+    const buddy = $("jumperBuddy");
+    let x = 175, y = 350, vy = -8, height = 0;
+    const platforms = [];
+    for (let i = 0; i < 8; i++) platforms.push({ x: 20 + Math.random() * 300, y: 400 - i * 60, el: null });
+    function drawPlats() {
+      platforms.forEach(p => {
+        if (!p.el) {
+          p.el = document.createElement("div");
+          p.el.className = "jumper-plat";
+          field.appendChild(p.el);
+        }
+        p.el.style.left = p.x + "px";
+        p.el.style.top  = p.y + "px";
       });
     }
-    function nextRound(ok) {
-      if (ok) { correct++; GameRunner.coins += 30; floatText("+30", "#4ade80"); }
-      round++;
-      $("defRound").textContent = Math.min(round, 10);
-      $("defScore").textContent = correct;
-      GameRunner.score = correct;
-      updateGameHUD();
-      if (round > 10) {
-        const bonus = correct === 10 ? 100 : 0;
-        endGame({ win: correct >= 7, coins: GameRunner.coins + bonus, title: correct === 10 ? "💣 Perfect Defuse!" : "💣 Complete", stats: `Correct: ${correct}/10 · Bonus: +${bonus}` });
-      } else {
-        setTimeout(newRound, 500);
+    drawPlats();
+    field.onclick = e => {
+      const rect = field.getBoundingClientRect();
+      x += (e.clientX - rect.left < rect.width / 2) ? -60 : 60;
+      x = Math.max(0, Math.min(350, x));
+    };
+    let timer = setInterval(() => {
+      vy += 0.35;
+      y += vy;
+      // hit platform (only when falling)
+      if (vy > 0) {
+        platforms.forEach(p => {
+          if (y + 30 >= p.y && y + 30 <= p.y + 12 && x + 30 > p.x && x < p.x + 60) {
+            vy = -8;
+            GameRunner.coins += 3;
+            updateGameHUD();
+          }
+        });
       }
+      // scroll world down if player is high
+      if (y < 150) {
+        const dy = 150 - y;
+        y = 150;
+        height += dy * 0.1;
+        platforms.forEach(p => {
+          p.y += dy;
+          if (p.y > 460) { p.y = -20; p.x = Math.random() * 340; }
+        });
+      }
+      if (y > 460) return die();
+      buddy.style.left = x + "px";
+      buddy.style.top  = y + "px";
+      $("jumperH").textContent = Math.floor(height);
+      GameRunner.score = Math.floor(height);
+      drawPlats();
+    }, 20);
+    function die() {
+      clearInterval(timer);
+      screenShake(document.body, 10);
+      GameRunner.coins += Math.floor(height * 2);
+      endGame({ win: height >= 100, coins: GameRunner.coins, title: "🦘 Splat!", stats: `Height: ${Math.floor(height)}m` });
     }
-    newRound();
+    GameRunner.onQuit = () => clearInterval(timer);
   }
 };
 
-// ====== 6. DICE DUEL ======
-Modes.dice = {
-  start(canvas) {
-    const faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
-    let current = Math.floor(Math.random() * 6) + 1;
-    let streak = 0, wrongs = 0;
-    canvas.innerHTML = `
-      <div class="dice-wrap">
-        <div class="dice-current" id="diceCur">${faces[current-1]}</div>
-        <div style="text-align:center;margin:14px 0;color:var(--dim)">
-          Will the next roll be HIGHER or LOWER than <b id="diceCurVal">${current}</b>?
-        </div>
-        <div class="dice-buttons">
-          <button class="big-btn" id="diceHi">⬆ HIGHER</button>
-          <button class="big-btn secondary" id="diceLo">⬇ LOWER</button>
-        </div>
-        <div style="text-align:center;margin-top:14px;color:var(--dim)">
-          Streak: <span id="diceStreak">0</span> · Wrongs: <span id="diceWr">0</span>/3
-        </div>
-      </div>
-    `;
-    function guess(kind) {
-      const next = Math.floor(Math.random() * 6) + 1;
-      $("diceCur").textContent = faces[next-1];
-      const ok = (kind === "hi" && next > current) || (kind === "lo" && next < current);
-      if (next === current) {
-        floatText("Same! Free roll", "#ffd93d");
-      } else if (ok) {
-        streak++;
-        const earn = 10 * streak;
-        GameRunner.coins += earn;
-        GameRunner.score = streak;
-        floatText("+" + earn, "#4ade80");
-      } else {
-        wrongs++;
-        streak = 0;
-        floatText("Wrong!", "#ff5470");
-      }
-      current = next;
-      $("diceCurVal").textContent = current;
-      $("diceStreak").textContent = streak;
-      $("diceWr").textContent = wrongs;
-      updateGameHUD();
-      if (wrongs >= 3) {
-        endGame({ win: GameRunner.coins >= 100, coins: GameRunner.coins, title: "🎲 Game Over", stats: `Best streak: ${GameRunner.score}` });
-      }
-    }
-    $("diceHi").onclick = () => guess("hi");
-    $("diceLo").onclick = () => guess("lo");
-  }
-};
-
-// ====== 7. TRAFFIC DODGE ======
-Modes.dodge = {
+// ====== 5. SLICE RUSH ======
+Modes.slice = {
   start(canvas) {
     canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:14px">
-        Tap a lane to move your car. Dodge everything!
+      <div style="text-align:center;color:var(--dim);margin-bottom:6px">
+        Tap flying buddies to slice them! Bombs = penalty.
       </div>
-      <div class="dodge-road" id="dodgeRoad">
-        <div class="dodge-lane" data-l="0"></div>
-        <div class="dodge-lane" data-l="1"></div>
-        <div class="dodge-lane" data-l="2"></div>
-        <div id="dodgePlayer" class="dodge-player">🚗</div>
-      </div>
+      <div class="slice-field" id="sliceField"></div>
     `;
-    let lane = 1;
-    const player = $("dodgePlayer");
-    player.style.left = "50%";
-    document.querySelectorAll(".dodge-lane").forEach(l => {
-      l.onclick = () => {
-        const target = parseInt(l.dataset.l);
-        lane = target;
-        player.style.left = (16.6 + target * 33.3) + "%";
-      };
-    });
-    const road = $("dodgeRoad");
-    const obstacles = [];
+    const field = $("sliceField");
+    const flying = [];
     const spawn = setInterval(() => {
-      const o = document.createElement("div");
-      o.className = "dodge-obs";
-      o.textContent = ["🚧","🔺","💣","🕳️","🌵"][Math.floor(Math.random()*5)];
-      const laneIdx = Math.floor(Math.random() * 3);
-      o.style.left = (16.6 + laneIdx * 33.3) + "%";
-      o.style.top = "-40px";
-      o.dataset.lane = laneIdx;
-      road.appendChild(o);
-      obstacles.push({ el: o, y: -40, lane: laneIdx });
-    }, 700);
-    const move = setInterval(() => {
-      obstacles.forEach(ob => {
-        ob.y += 6;
-        ob.el.style.top = ob.y + "px";
-        if (ob.y > 380 && !ob.passed) {
-          ob.passed = true;
-          GameRunner.coins += 5;
-          updateGameHUD();
-        }
-        if (ob.y > 300 && ob.y < 360 && ob.lane === lane) {
-          floatText("CRASH!", "#ff5470");
-          stop();
-        }
-        if (ob.y > 500) { ob.el.remove(); }
-      });
-    }, 30);
-    function stop() {
-      clearInterval(spawn); clearInterval(move);
-      obstacles.forEach(o => o.el.remove());
-      endGame({ win: false, coins: GameRunner.coins, title: "🚗 Crashed!", stats: `Coins earned: ${GameRunner.coins}` });
-    }
-    GameRunner.onQuit = () => { clearInterval(spawn); clearInterval(move); };
-    gameTimer(60, () => {
-      clearInterval(spawn); clearInterval(move);
-      endGame({ win: true, coins: GameRunner.coins + 80, title: "🚗 You Survived!", stats: `Bonus: +80` });
-    });
-  }
-};
-
-// ====== 8. SIMON SAYS ======
-Modes.simon = {
-  start(canvas) {
-    const colors = ["#ff5470","#38bdf8","#4ade80","#ffd93d"];
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:14px">
-        Watch the sequence, then repeat it. Adds one every round.
-      </div>
-      <div class="simon-grid" id="simonGrid">
-        ${colors.map((c,i)=>`<button class="simon-btn" data-i="${i}" style="background:${c}"></button>`).join("")}
-      </div>
-      <div style="text-align:center;margin-top:14px" id="simonStatus">Get ready...</div>
-    `;
-    let seq = [], userIdx = 0, playing = false;
-    function flash(i) {
-      return new Promise(res => {
-        const b = document.querySelector(`.simon-btn[data-i="${i}"]`);
-        b.classList.add("simon-lit");
-        setTimeout(() => { b.classList.remove("simon-lit"); res(); }, 420);
-      });
-    }
-    async function playSeq() {
-      playing = true;
-      $("simonStatus").textContent = "Watch...";
-      for (const i of seq) {
-        await flash(i);
-        await new Promise(r => setTimeout(r, 120));
-      }
-      playing = false;
-      userIdx = 0;
-      $("simonStatus").textContent = "Your turn!";
-    }
-    function next() {
-      seq.push(Math.floor(Math.random() * 4));
-      GameRunner.score = seq.length - 1;
-      updateGameHUD();
-      setTimeout(playSeq, 500);
-    }
-    document.querySelectorAll(".simon-btn").forEach(b => {
-      b.onclick = async () => {
-        if (playing) return;
-        const i = parseInt(b.dataset.i);
-        await flash(i);
-        if (i === seq[userIdx]) {
-          userIdx++;
-          if (userIdx === seq.length) {
-            const earn = seq.length * 15;
-            GameRunner.coins += earn;
-            floatText("+" + earn, "#4ade80");
-            updateGameHUD();
-            next();
-          }
-        } else {
-          floatText("Wrong!", "#ff5470");
-          endGame({ win: seq.length >= 5, coins: GameRunner.coins, title: "🧠 Sequence Broken", stats: `Reached: ${seq.length - 1} steps` });
-        }
-      };
-    });
-    next();
-  }
-};
-
-// ====== 9. REACTION TEST ======
-Modes.react = {
-  start(canvas) {
-    let round = 1, totalMs = 0;
-    canvas.innerHTML = `
-      <div class="react-wrap" id="reactWrap">
-        <div class="react-status" id="reactStatus">Wait for green...</div>
-        <div class="react-time" id="reactTime">—</div>
-        <div class="react-round">Round <span id="reactR">1</span>/5</div>
-      </div>
-    `;
-    const wrap = $("reactWrap");
-    let waitTimer, startTime, state = "waiting";
-    function begin() {
-      wrap.classList.remove("react-go","react-clicked");
-      wrap.classList.add("react-red");
-      $("reactStatus").textContent = "Wait...";
-      $("reactTime").textContent = "—";
-      state = "waiting";
-      const delay = 1500 + Math.random() * 3000;
-      waitTimer = setTimeout(() => {
-        wrap.classList.remove("react-red");
-        wrap.classList.add("react-go");
-        $("reactStatus").textContent = "GO! Tap!";
-        startTime = Date.now();
-        state = "go";
-      }, delay);
-    }
-    wrap.onclick = () => {
-      if (state === "waiting") {
-        clearTimeout(waitTimer);
-        $("reactStatus").textContent = "Too early!";
-        totalMs += 1000;
-        setTimeout(nextRound, 900);
-      } else if (state === "go") {
-        const ms = Date.now() - startTime;
-        totalMs += ms;
-        $("reactTime").textContent = ms + " ms";
-        wrap.classList.remove("react-go");
-        wrap.classList.add("react-clicked");
-        const earn = Math.max(0, Math.round((500 - ms) * 0.3));
-        if (earn > 0) { GameRunner.coins += earn; floatText("+" + earn, "#4ade80"); updateGameHUD(); }
-        state = "done";
-        setTimeout(nextRound, 900);
-      }
-    };
-    function nextRound() {
-      if (round >= 5) {
-        const avg = Math.round(totalMs / 5);
-        GameRunner.score = avg;
-        updateGameHUD();
-        endGame({ win: avg < 350, coins: GameRunner.coins, title: "⚡ Reaction Done", stats: `Average: ${avg} ms` });
-        return;
-      }
-      round++;
-      $("reactR").textContent = round;
-      begin();
-    }
-    begin();
-    GameRunner.onQuit = () => clearTimeout(waitTimer);
-  }
-};
-
-// ====== 10. COLOR RUSH ======
-Modes.color = {
-  start(canvas) {
-    const colors = [
-      { css: "#ff5470", key: "red"    },
-      { css: "#38bdf8", key: "blue"   },
-      { css: "#4ade80", key: "green"  },
-      { css: "#ffd93d", key: "yellow" }
-    ];
-    canvas.innerHTML = `
-      <div style="text-align:center;color:var(--dim);margin-bottom:10px">
-        Tap the color slot that matches each falling buddy before it hits the ground!
-      </div>
-      <div class="color-field" id="colorField"></div>
-      <div class="color-slots" id="colorSlots"></div>
-    `;
-    const field = $("colorField");
-    const slots = $("colorSlots");
-    colors.forEach(c => {
-      const s = document.createElement("button");
-      s.className = "color-slot";
-      s.style.background = c.css;
-      s.dataset.key = c.key;
-      slots.appendChild(s);
-    });
-    const falling = [];
-    function spawn() {
-      const c = colors[Math.floor(Math.random() * colors.length)];
+      const isBomb = Math.random() < 0.15;
       const el = document.createElement("div");
-      el.className = "color-buddy";
-      el.textContent = "🐰";
-      el.style.color = c.css;
-      el.style.left = (20 + Math.random() * 60) + "%";
-      el.style.top = "-40px";
-      el.dataset.key = c.key;
+      el.className = "slice-obj";
+      el.textContent = isBomb ? "💣" : ["🐶","🐱","🦊","🐰","🍎","🍉","🍊"][Math.floor(Math.random()*7)];
+      el.style.left = "-40px";
+      el.style.bottom = "0px";
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      const startX = dir === 1 ? -40 : field.offsetWidth + 40;
+      const targetY = 100 + Math.random() * 150;
+      const obj = { el, x: startX, y: 0, vx: dir * (4 + Math.random() * 3), vy: -14 - Math.random() * 4, gravity: 0.4, bomb: isBomb, sliced: false };
+      el.style.left = startX + "px";
       field.appendChild(el);
-      falling.push({ el, y: -40, key: c.key });
-    }
-    const sp = setInterval(spawn, 800);
-    const mv = setInterval(() => {
-      falling.forEach(f => {
-        if (f.dead) return;
-        f.y += 4;
-        f.el.style.top = f.y + "px";
-        if (f.y > 320) { f.dead = true; f.el.remove(); floatText("Missed!", "#ff5470"); }
-      });
-    }, 30);
-    slots.querySelectorAll(".color-slot").forEach(s => {
-      s.onclick = () => {
-        const key = s.dataset.key;
-        const target = falling.find(f => !f.dead && f.y > 100 && f.key === key);
-        if (target) {
-          target.dead = true;
-          target.el.remove();
-          GameRunner.coins += 12;
-          GameRunner.score++;
-          floatText("+12", "#4ade80");
-          updateGameHUD();
+      el.onclick = e => {
+        if (obj.sliced) return;
+        obj.sliced = true;
+        if (obj.bomb) {
+          GameRunner.coins = Math.max(0, GameRunner.coins - 30);
+          floatText("-30 BOMB!", "#ff5470");
+          screenShake(document.body, 10);
         } else {
+          GameRunner.coins += 20;
+          GameRunner.score++;
+          floatText("+20", "#4ade80");
+          popParticles(e.clientX, e.clientY, 8, obj.bomb ? "#ff5470" : "#4ade80");
+        }
+        updateGameHUD();
+        el.remove();
+      };
+      flying.push(obj);
+    }, 700);
+    const mv = setInterval(() => {
+      flying.forEach(f => {
+        if (f.sliced) return;
+        f.x += f.vx;
+        f.y += f.vy;
+        f.vy += f.gravity;
+        f.el.style.left = f.x + "px";
+        f.el.style.bottom = -f.y + "px";
+        if (f.y > 20) { f.sliced = true; f.el.remove(); }
+      });
+    }, 20);
+    GameRunner.onQuit = () => { clearInterval(spawn); clearInterval(mv); };
+    gameTimer(60, () => {
+      clearInterval(spawn); clearInterval(mv);
+      flying.forEach(f => f.el.remove());
+      endGame({ win: GameRunner.score >= 25, coins: GameRunner.coins, title: "🥷 Slice Done!", stats: `Sliced: ${GameRunner.score}` });
+    });
+  }
+};
+
+// ====== 6. BUDDY BREAK (Breakout) ======
+Modes.break = {
+  start(canvas) {
+    const W = 400, H = 460;
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:6px">
+        Tap anywhere in the field to aim the paddle. Break all the blocks!
+      </div>
+      <div class="brk-field" id="brkField" style="width:${W}px;height:${H}px"></div>
+    `;
+    const field = $("brkField");
+    let paddleX = W/2 - 40;
+    let bx = W/2, by = H - 40, vx = 3, vy = -4;
+    const blocks = [];
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 8; c++) {
+      blocks.push({ x: c * 50 + 5, y: r * 24 + 20, w: 44, h: 18, hp: 1, color: ["#ff5470","#ffd93d","#4ade80","#38bdf8","#a855f7"][r] });
+    }
+    function render() {
+      field.innerHTML = "";
+      const p = document.createElement("div");
+      p.className = "brk-paddle";
+      p.style.left = paddleX + "px";
+      field.appendChild(p);
+      const b = document.createElement("div");
+      b.className = "brk-ball";
+      b.style.left = (bx-8) + "px";
+      b.style.top = (by-8) + "px";
+      field.appendChild(b);
+      blocks.forEach(bl => {
+        if (bl.hp <= 0) return;
+        const d = document.createElement("div");
+        d.className = "brk-block";
+        d.style.left = bl.x + "px"; d.style.top = bl.y + "px";
+        d.style.width = bl.w + "px"; d.style.height = bl.h + "px";
+        d.style.background = bl.color;
+        field.appendChild(d);
+      });
+    }
+    field.onmousemove = e => {
+      const rect = field.getBoundingClientRect();
+      paddleX = Math.max(0, Math.min(W - 80, e.clientX - rect.left - 40));
+    };
+    field.ontouchmove = e => {
+      const rect = field.getBoundingClientRect();
+      paddleX = Math.max(0, Math.min(W - 80, e.touches[0].clientX - rect.left - 40));
+      e.preventDefault();
+    };
+    const t = setInterval(() => {
+      bx += vx; by += vy;
+      if (bx < 8 || bx > W-8) vx = -vx;
+      if (by < 8) vy = -vy;
+      if (by > H - 30 && bx > paddleX && bx < paddleX + 80) {
+        vy = -Math.abs(vy);
+        vx += (bx - (paddleX + 40)) * 0.05;
+      }
+      if (by > H) return die();
+      blocks.forEach(bl => {
+        if (bl.hp <= 0) return;
+        if (bx > bl.x && bx < bl.x + bl.w && by > bl.y && by < bl.y + bl.h) {
+          bl.hp = 0;
+          vy = -vy;
+          GameRunner.coins += 15;
+          GameRunner.score++;
+          floatText("+15", bl.color);
+          updateGameHUD();
+        }
+      });
+      if (blocks.every(bl => bl.hp <= 0)) {
+        clearInterval(t);
+        endGame({ win: true, coins: GameRunner.coins + 200, title: "🏓 CLEARED!", stats: `Bonus: +200` });
+      }
+      render();
+    }, 20);
+    function die() {
+      clearInterval(t);
+      screenShake(document.body, 10);
+      endGame({ win: false, coins: GameRunner.coins, title: "🏓 Ball Lost", stats: `Blocks broken: ${GameRunner.score}/40` });
+    }
+    render();
+    GameRunner.onQuit = () => clearInterval(t);
+  }
+};
+
+// ====== 7. TAP BEAT ======
+Modes.beat = {
+  start(canvas) {
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:6px">
+        Tap the lane when the note reaches the pink line! Combos multiply.
+      </div>
+      <div class="beat-combo" id="beatCombo">Combo: 0</div>
+      <div class="beat-field" id="beatField">
+        <div class="beat-lane" data-l="0"></div>
+        <div class="beat-lane" data-l="1"></div>
+        <div class="beat-lane" data-l="2"></div>
+        <div class="beat-lane" data-l="3"></div>
+        <div class="beat-line"></div>
+      </div>
+    `;
+    const field = $("beatField");
+    const lanes = [...field.querySelectorAll(".beat-lane")];
+    const notes = [];
+    let combo = 0;
+    const lineY = 380;
+    const colors = ["#ff5470","#38bdf8","#4ade80","#ffd93d"];
+    lanes.forEach((lane, li) => {
+      lane.onclick = () => {
+        const hit = notes.find(n => !n.dead && n.lane === li && Math.abs(n.y - lineY) < 40);
+        if (hit) {
+          hit.dead = true; hit.el.remove();
+          combo++;
+          const earn = 10 + combo * 2;
+          GameRunner.coins += earn;
+          GameRunner.score = combo;
+          floatText("+" + earn, "#4ade80");
+          $("beatCombo").textContent = "Combo: " + combo;
+          updateGameHUD();
+          lane.classList.add("beat-hit");
+          setTimeout(() => lane.classList.remove("beat-hit"), 100);
+        } else {
+          combo = 0;
+          $("beatCombo").textContent = "Combo: 0";
           floatText("Miss!", "#ff5470");
         }
       };
     });
+    const sp = setInterval(() => {
+      const li = Math.floor(Math.random() * 4);
+      const el = document.createElement("div");
+      el.className = "beat-note";
+      el.style.background = colors[li];
+      lanes[li].appendChild(el);
+      notes.push({ el, lane: li, y: -40 });
+    }, 700);
+    const mv = setInterval(() => {
+      notes.forEach(n => {
+        if (n.dead) return;
+        n.y += 5;
+        n.el.style.top = n.y + "px";
+        if (n.y > 460) {
+          n.dead = true; n.el.remove();
+          combo = 0;
+          $("beatCombo").textContent = "Combo: 0";
+        }
+      });
+    }, 20);
     GameRunner.onQuit = () => { clearInterval(sp); clearInterval(mv); };
     gameTimer(60, () => {
       clearInterval(sp); clearInterval(mv);
-      falling.forEach(f => f.el.remove());
-      endGame({ win: GameRunner.score >= 25, coins: GameRunner.coins, title: "🎨 Time!", stats: `Matches: ${GameRunner.score}` });
+      endGame({ win: GameRunner.score >= 15, coins: GameRunner.coins, title: "🎵 Song Over!", stats: `Best combo: ${GameRunner.score}` });
+    });
+  }
+};
+
+// ====== 8. LUCKY DIG ======
+Modes.dig = {
+  start(canvas) {
+    const SIZE = 6;
+    const bombCount = 5;
+    let stash = 0, opened = 0, done = false;
+    const grid = [];
+    for (let r = 0; r < SIZE; r++) grid.push(Array(SIZE).fill(0).map(() => ({ bomb: false, revealed: false, value: 0 })));
+    let placed = 0;
+    while (placed < bombCount) {
+      const r = Math.floor(Math.random() * SIZE), c = Math.floor(Math.random() * SIZE);
+      if (!grid[r][c].bomb) { grid[r][c].bomb = true; placed++; }
+    }
+    for (let r = 0; r < SIZE; r++) for (let c = 0; c < SIZE; c++) {
+      if (grid[r][c].bomb) continue;
+      let n = 0;
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+        const rr = r + dr, cc = c + dc;
+        if (rr < 0 || rr >= SIZE || cc < 0 || cc >= SIZE) continue;
+        if (grid[rr][cc].bomb) n++;
+      }
+      grid[r][c].value = n;
+    }
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:6px">
+        Dig tiles for coins. Numbers = adjacent bombs. Cash out anytime!
+      </div>
+      <div style="text-align:center;margin-bottom:8px">
+        Stash: <span id="digStash" style="color:var(--accent);font-weight:800">0</span> · <button class="big-btn secondary" id="digCash" style="padding:6px 14px;font-size:12px">CASH OUT</button>
+      </div>
+      <div class="dig-grid" id="digGrid" style="grid-template-columns:repeat(${SIZE},1fr)"></div>
+    `;
+    const gridEl = $("digGrid");
+    for (let r = 0; r < SIZE; r++) for (let c = 0; c < SIZE; c++) {
+      const cell = document.createElement("div");
+      cell.className = "dig-cell";
+      cell.dataset.r = r; cell.dataset.c = c;
+      cell.onclick = () => reveal(r, c);
+      gridEl.appendChild(cell);
+    }
+    function reveal(r, c) {
+      if (done) return;
+      const g = grid[r][c];
+      if (g.revealed) return;
+      g.revealed = true;
+      const cell = gridEl.children[r * SIZE + c];
+      cell.classList.add("dig-open");
+      if (g.bomb) {
+        cell.textContent = "💥";
+        cell.classList.add("dig-bomb");
+        screenShake(document.body, 12);
+        bigPop("BOOM!", "#ff5470");
+        done = true;
+        setTimeout(() => endGame({ win: false, coins: GameRunner.coins, title: "💣 BOOM!", stats: `Lost the stash: ${stash}` }), 800);
+        return;
+      }
+      opened++;
+      const earn = 15 + g.value * 5;
+      stash += earn;
+      $("digStash").textContent = stash;
+      cell.textContent = g.value > 0 ? g.value : "✓";
+      cell.style.color = ["#4ade80","#38bdf8","#a855f7","#ff6b9d","#ff5470"][Math.min(g.value, 4)];
+      floatText("+" + earn, "#4ade80");
+      GameRunner.score = opened;
+      updateGameHUD();
+    }
+    $("digCash").onclick = () => {
+      if (done) return;
+      done = true;
+      GameRunner.coins += stash;
+      bigPop("+" + stash + " 🪙", "#ffd93d");
+      updateGameHUD();
+      endGame({ win: stash > 100, coins: GameRunner.coins, title: "💰 Cashed Out!", stats: `Stash: +${stash} · Cells opened: ${opened}` });
+    };
+  }
+};
+
+// ====== 9. TARGET SNIPER ======
+Modes.sniper = {
+  start(canvas) {
+    canvas.innerHTML = `
+      <div style="text-align:center;color:var(--dim);margin-bottom:6px">
+        Targets pop up all over. Tap fast! Perfect center = BULLSEYE!
+      </div>
+      <div class="sniper-field" id="sniperField"></div>
+    `;
+    const field = $("sniperField");
+    const targets = [];
+    const spawn = setInterval(() => {
+      const el = document.createElement("div");
+      el.className = "sniper-target";
+      el.innerHTML = "🎯";
+      el.style.left = (Math.random() * 85 + 5) + "%";
+      el.style.top  = (Math.random() * 80 + 5) + "%";
+      el.style.transform = "translate(-50%, -50%) scale(0.2)";
+      field.appendChild(el);
+      const t = { el, born: Date.now() };
+      targets.push(t);
+      requestAnimationFrame(() => el.style.transform = "translate(-50%, -50%) scale(1)");
+      el.onclick = e => {
+        e.stopPropagation();
+        const age = Date.now() - t.born;
+        const earn = age < 400 ? 60 : age < 900 ? 30 : 10;
+        GameRunner.coins += earn;
+        GameRunner.score++;
+        floatText(age < 400 ? "BULLSEYE +" + earn : "+" + earn, age < 400 ? "#ffd93d" : "#4ade80");
+        popParticles(e.clientX, e.clientY, 10, age < 400 ? "#ffd93d" : "#4ade80");
+        updateGameHUD();
+        el.remove();
+        t.dead = true;
+      };
+      setTimeout(() => { if (!t.dead) { el.remove(); t.dead = true; } }, 1600);
+    }, 750);
+    GameRunner.onQuit = () => clearInterval(spawn);
+    gameTimer(60, () => {
+      clearInterval(spawn);
+      targets.forEach(t => t.el.remove());
+      endGame({ win: GameRunner.score >= 20, coins: GameRunner.coins, title: "🎯 Time's Up!", stats: `Hits: ${GameRunner.score}` });
+    });
+  }
+};
+
+// ====== 10. COMBO PUNCH ======
+Modes.punch = {
+  start(canvas) {
+    let hp = 500, combo = 0;
+    canvas.innerHTML = `
+      <div class="punch-wrap">
+        <div class="punch-boss" id="punchBoss">👹</div>
+        <div class="punch-hp"><div class="punch-hp-fill" id="punchHp"></div></div>
+        <div style="text-align:center;color:var(--dim);margin:8px 0">HP: <span id="punchHpN">500</span> · Combo: <span id="punchCombo">0</span></div>
+        <div id="punchPrompt" class="punch-prompt">TAP the shown key!</div>
+        <div class="punch-dirs">
+          <button class="punch-btn" data-k="⬅">⬅</button>
+          <button class="punch-btn" data-k="⬆">⬆</button>
+          <button class="punch-btn" data-k="⬇">⬇</button>
+          <button class="punch-btn" data-k="➡">➡</button>
+        </div>
+      </div>
+    `;
+    const keys = ["⬅","⬆","⬇","➡"];
+    let target = keys[Math.floor(Math.random() * 4)];
+    $("punchPrompt").textContent = target;
+    document.querySelectorAll(".punch-btn").forEach(b => {
+      b.onclick = () => {
+        if (b.dataset.k === target) {
+          combo++;
+          const dmg = 20 + combo * 5;
+          hp -= dmg;
+          GameRunner.coins += dmg;
+          GameRunner.score = Math.max(GameRunner.score, combo);
+          $("punchBoss").style.animation = "punchHit 0.2s";
+          setTimeout(() => $("punchBoss").style.animation = "", 200);
+          popParticles(window.innerWidth/2, 200, 6, "#ff5470");
+          floatText("-" + dmg, "#ff5470");
+          if (combo % 5 === 0) { bigPop("x" + combo + " COMBO!", "#ffd93d"); }
+        } else {
+          combo = 0;
+          floatText("Missed!", "#ff5470");
+        }
+        target = keys[Math.floor(Math.random() * 4)];
+        $("punchPrompt").textContent = target;
+        $("punchHpN").textContent = Math.max(0, hp);
+        $("punchCombo").textContent = combo;
+        $("punchHp").style.width = Math.max(0, hp / 500 * 100) + "%";
+        updateGameHUD();
+        if (hp <= 0) {
+          endGame({ win: true, coins: GameRunner.coins + 150, title: "👊 BOSS DOWN!", stats: `Best combo: ${GameRunner.score}` });
+        }
+      };
     });
   }
 };
