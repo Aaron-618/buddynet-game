@@ -1855,6 +1855,84 @@ const GAME_MODES = [
 
 const Modes = {};
 
+const GameRunner = {
+  current: null,
+  coins: 0, score: 0, time: 0,
+  timer: null,
+  onTick: null,
+  onQuit: null
+};
+
+function renderPlay() {
+  const grid = $("modeGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  GAME_MODES.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "mode-card";
+    card.innerHTML = `
+      <div class="mode-emoji">${m.emoji}</div>
+      <div class="mode-name">${m.name}</div>
+      <div class="mode-desc">${m.desc}</div>
+    `;
+    card.onclick = () => startMode(m.id);
+    grid.appendChild(card);
+  });
+}
+
+function startMode(id) {
+  GameRunner.current = id;
+  GameRunner.coins = 0; GameRunner.score = 0; GameRunner.time = 0;
+  GameRunner.onQuit = null; GameRunner.onTick = null;
+  if (GameRunner.timer) { clearInterval(GameRunner.timer); GameRunner.timer = null; }
+  const mode = GAME_MODES.find(m => m.id === id);
+  $("gameTitle").textContent = mode.emoji + " " + mode.name;
+  $("gameCoins").textContent = 0;
+  $("gameScore").textContent = 0;
+  $("gameTimer").textContent = "—";
+  $("gameCanvas").innerHTML = "";
+  show("gameRunner");
+  Modes[id].start($("gameCanvas"));
+}
+
+function updateGameHUD() {
+  $("gameCoins").textContent = GameRunner.coins;
+  $("gameScore").textContent = GameRunner.score;
+}
+
+function gameTimer(secs, onEnd) {
+  GameRunner.time = secs;
+  $("gameTimer").textContent = secs;
+  GameRunner.timer = setInterval(() => {
+    GameRunner.time--;
+    $("gameTimer").textContent = GameRunner.time;
+    if (GameRunner.onTick) GameRunner.onTick();
+    if (GameRunner.time <= 0) {
+      clearInterval(GameRunner.timer);
+      GameRunner.timer = null;
+      onEnd();
+    }
+  }, 1000);
+}
+
+function endGame({ win, title, coins, stats }) {
+  if (GameRunner.timer) { clearInterval(GameRunner.timer); GameRunner.timer = null; }
+  GameRunner.onTick = null;
+  coins = Math.round(coins);
+  State.coins += coins;
+  if (win) State.achievements.games_won = (State.achievements.games_won || 0) + 1;
+  save();
+  updateWallet();
+  renderShop();
+  maybeUnlockSecrets();
+  $("gameResultIcon").textContent = win ? "🏆" : "💪";
+  $("gameResultTitle").textContent = title || (win ? "VICTORY!" : "GAME OVER");
+  $("gameResultTitle").style.color = win ? "var(--accent2)" : "var(--pink)";
+  $("gameResultCoins").textContent = coins.toLocaleString();
+  $("gameResultStats").innerHTML = stats || "";
+  $("gameResult").classList.add("show");
+}
+
 // ====== 1. REEL IT IN ======
 Modes.reel = {
   start(canvas) {
