@@ -2325,10 +2325,10 @@ Modes.slice = {
       });
     }, 20);
     GameRunner.onQuit = () => { clearInterval(spawn); clearInterval(mv); };
-    gameTimer(60, () => {
+    gameTimer(30, () => {
       clearInterval(spawn); clearInterval(mv);
       flying.forEach(f => f.el.remove());
-      endGame({ win: GameRunner.score >= 25, coins: GameRunner.coins, title: "🥷 Slice Done!", stats: `Sliced: ${GameRunner.score}` });
+      endGame({ win: GameRunner.score >= 12, coins: GameRunner.coins, title: "🥷 Slice Done!", stats: `Sliced: ${GameRunner.score}` });
     });
   }
 };
