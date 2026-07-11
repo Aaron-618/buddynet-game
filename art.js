@@ -59,6 +59,82 @@ CUSTOM_SVG.dino_pterodactyl = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.o
   <path d="M62 76 Q70 76 74 82 Q68 80 63 80 Z" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1"/>
 </svg>`;
 
+// ---------- MUMMY (Necropolis Rare) — cartoon bandaged mummy ----------
+CUSTOM_SVG.necro_mummy = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mmBand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#FCF5E5"/>
+      <stop offset="1"   stop-color="#D8C9A0"/>
+    </linearGradient>
+  </defs>
+  <!-- Cast shadow -->
+  <ellipse cx="50" cy="94" rx="26" ry="4" fill="#1a1a2e" opacity="0.3"/>
+
+  <!-- Left leg -->
+  <path d="M35 76 Q30 76 30 82 L28 92 Q28 96 33 96 L40 96 Q42 90 41 76 Z"
+        fill="url(#mmBand)" stroke="#3B2100" stroke-width="1.4" stroke-linejoin="round"/>
+  <!-- Left leg bandage cross-strips -->
+  <path d="M31 80 L40 80" stroke="#3B2100" stroke-width="1"/>
+  <path d="M30 84 L40 84" stroke="#3B2100" stroke-width="1"/>
+  <path d="M29 88 L39 88" stroke="#3B2100" stroke-width="1"/>
+  <path d="M28 92 L38 92" stroke="#3B2100" stroke-width="1"/>
+
+  <!-- Right leg (slightly in front) -->
+  <path d="M52 76 L52 92 Q52 96 57 96 L64 96 Q68 96 68 92 L64 78 Q60 76 52 76 Z"
+        fill="url(#mmBand)" stroke="#3B2100" stroke-width="1.4" stroke-linejoin="round"/>
+  <!-- Right leg cross-strips -->
+  <path d="M52 80 L64 80" stroke="#3B2100" stroke-width="1"/>
+  <path d="M52 84 L65 84" stroke="#3B2100" stroke-width="1"/>
+  <path d="M52 88 L66 88" stroke="#3B2100" stroke-width="1"/>
+  <path d="M53 92 L67 92" stroke="#3B2100" stroke-width="1"/>
+  <!-- Loose bandage end hanging from right leg -->
+  <path d="M62 90 Q66 92 65 96" stroke="#3B2100" stroke-width="1.2" fill="url(#mmBand)"/>
+
+  <!-- Body (torso wrapped in bandages) -->
+  <path d="M28 42 Q26 40 30 38 L70 38 Q74 40 72 42 L68 78 Q60 82 50 82 Q40 82 32 78 Z"
+        fill="url(#mmBand)" stroke="#3B2100" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Torso wrap lines (diagonal + horizontal, criss-crossed) -->
+  <path d="M28 48 Q50 52 72 48" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M27 56 Q50 60 73 56" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M28 64 Q50 68 72 64" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M30 72 Q50 76 70 72" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <!-- One diagonal wrap for variety -->
+  <path d="M32 42 L68 78" stroke="#3B2100" stroke-width="0.7" fill="none" opacity="0.6"/>
+
+  <!-- Left arm (out to the side) -->
+  <path d="M8 52 Q6 46 12 44 L28 46 L28 60 L14 66 Q6 62 8 52 Z"
+        fill="url(#mmBand)" stroke="#3B2100" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M10 50 L27 50" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M12 56 L27 56" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M12 62 L26 62" stroke="#3B2100" stroke-width="1" fill="none"/>
+
+  <!-- Right arm (out to the side) -->
+  <path d="M92 52 Q94 46 88 44 L72 46 L72 60 L86 66 Q94 62 92 52 Z"
+        fill="url(#mmBand)" stroke="#3B2100" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M73 50 L90 50" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M73 56 L88 56" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M74 62 L88 62" stroke="#3B2100" stroke-width="1" fill="none"/>
+
+  <!-- Head (round, wrapped) -->
+  <circle cx="50" cy="28" r="20" fill="url(#mmBand)" stroke="#3B2100" stroke-width="1.5"/>
+  <!-- Head bandage wrap lines -->
+  <path d="M32 22 Q50 24 68 22" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M32 30 Q50 32 68 30" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M34 38 Q50 40 66 38" stroke="#3B2100" stroke-width="1" fill="none"/>
+  <path d="M40 14 L44 46" stroke="#3B2100" stroke-width="0.7" fill="none" opacity="0.5"/>
+  <path d="M60 14 L56 46" stroke="#3B2100" stroke-width="0.7" fill="none" opacity="0.5"/>
+
+  <!-- Eyes (peek through bandages) -->
+  <circle cx="42" cy="28" r="3"   fill="#1a1a2e"/>
+  <circle cx="58" cy="28" r="3"   fill="#1a1a2e"/>
+  <circle cx="43" cy="27" r="0.8" fill="white"/>
+  <circle cx="59" cy="27" r="0.8" fill="white"/>
+
+  <!-- Loose bandage tail on the top of the head -->
+  <path d="M60 10 Q66 12 64 18 Q60 16 60 12 Z"
+        fill="url(#mmBand)" stroke="#3B2100" stroke-width="1" stroke-linejoin="round"/>
+</svg>`;
+
 // ---------- MAGMA DROP (Elemental Uncommon) — molten teardrop ----------
 CUSTOM_SVG.elemental_magma_drop = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
