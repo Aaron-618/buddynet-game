@@ -860,9 +860,18 @@ function buddyImg(emoji, cls = "", rarity = "", buddyId = "") {
   if (buddyId && typeof CUSTOM_SVG !== "undefined" && CUSTOM_SVG[buddyId]) {
     return `<div class="b-img b-custom ${cls}">${CUSTOM_SVG[buddyId]}</div>`;
   }
-  // Lower rarities: plain colored disc (looks cleaner than the emoji stand-ins)
-  if (rarity === "common" || rarity === "uncommon" || rarity === "rare" || rarity === "epic") {
-    return `<div class="b-img b-disc b-disc-${rarity} ${cls}"></div>`;
+  // Lower rarities: generate a unique character via DiceBear (a free art API).
+  // Each rarity gets its own art style so climbing tiers feels visible.
+  const DICEBEAR_STYLE = {
+    common:   "shapes",
+    uncommon: "fun-emoji",
+    rare:     "bottts",
+    epic:     "adventurer"
+  };
+  const dbStyle = DICEBEAR_STYLE[rarity];
+  if (dbStyle) {
+    const seed = encodeURIComponent(buddyId || emoji || "buddy");
+    return `<img class="b-img b-generated ${cls}" src="https://api.dicebear.com/9.x/${dbStyle}/svg?seed=${seed}&size=120" alt="buddy" loading="lazy" onerror="this.outerHTML='<div class=\\'b-img b-disc b-disc-${rarity} ${cls}\\'></div>'">`;
   }
   // Legendary / Chroma / Mystical / Secret: keep the emoji art
   const style = RARITY_EMOJI_STYLE[rarity] || "microsoft";

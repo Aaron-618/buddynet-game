@@ -703,7 +703,15 @@ body {
   pointer-events: none;
 }
 
-/* Lower-rarity buddies show a plain colored disc instead of an emoji */
+/* Generated-art buddies (from DiceBear) */
+.b-frame .b-generated {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
+  pointer-events: none;
+}
+
+/* Colored disc fallback if the generator API fails */
 .b-frame .b-disc {
   width: 100%; height: 100%;
   border-radius: 50%;
