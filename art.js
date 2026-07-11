@@ -59,6 +59,66 @@ CUSTOM_SVG.dino_pterodactyl = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.o
   <path d="M62 76 Q70 76 74 82 Q68 80 63 80 Z" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1"/>
 </svg>`;
 
+// ---------- HURRICANE (Storm Lords Rare) — spiraling funnel ----------
+CUSTOM_SVG.storm_hurricane = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="huFun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#5B7B9C"/>
+      <stop offset="0.4"  stop-color="#38546E"/>
+      <stop offset="1"    stop-color="#1E2E42"/>
+    </linearGradient>
+    <radialGradient id="huGlow" cx="0.5" cy="0.35" r="0.55">
+      <stop offset="0"    stop-color="#7FA3C8" stop-opacity="0.4"/>
+      <stop offset="1"    stop-color="#7FA3C8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Cast shadow (debris cloud at ground) -->
+  <ellipse cx="50" cy="94" rx="14" ry="3" fill="#1a1a2e" opacity="0.5"/>
+  <ellipse cx="50" cy="92" rx="20" ry="2.5" fill="#1a1a2e" opacity="0.3"/>
+
+  <!-- Atmospheric glow behind -->
+  <ellipse cx="50" cy="42" rx="42" ry="34" fill="url(#huGlow)"/>
+
+  <!-- Funnel body -->
+  <path d="M14 10
+           Q50 4 86 10
+           Q80 32 68 50
+           Q60 66 54 78
+           Q52 86 50 92
+           Q48 86 46 78
+           Q40 66 32 50
+           Q20 32 14 10 Z"
+        fill="url(#huFun)" stroke="#1E2E42" stroke-width="1.4" stroke-linejoin="round"/>
+
+  <!-- Horizontal swirl bands (lighter, for spin illusion) -->
+  <path d="M18 16 Q50 12 82 16"     stroke="#8FAECD" stroke-width="1.2" fill="none" opacity="0.6"/>
+  <path d="M20 24 Q50 20 80 24"     stroke="#8FAECD" stroke-width="1.2" fill="none" opacity="0.6"/>
+  <path d="M22 32 Q50 28 78 32"     stroke="#8FAECD" stroke-width="1.2" fill="none" opacity="0.6"/>
+  <path d="M25 42 Q50 38 75 42"     stroke="#8FAECD" stroke-width="1.1" fill="none" opacity="0.55"/>
+  <path d="M30 52 Q50 48 70 52"     stroke="#8FAECD" stroke-width="1"   fill="none" opacity="0.5"/>
+  <path d="M35 62 Q50 58 65 62"     stroke="#8FAECD" stroke-width="0.9" fill="none" opacity="0.45"/>
+  <path d="M40 72 Q50 68 60 72"     stroke="#8FAECD" stroke-width="0.8" fill="none" opacity="0.4"/>
+  <path d="M44 82 Q50 79 56 82"     stroke="#8FAECD" stroke-width="0.7" fill="none" opacity="0.35"/>
+
+  <!-- Darker inner swirls for depth (lower half) -->
+  <path d="M22 30 Q50 34 78 30" stroke="#101828" stroke-width="0.8" fill="none" opacity="0.55"/>
+  <path d="M28 46 Q50 50 72 46" stroke="#101828" stroke-width="0.8" fill="none" opacity="0.5"/>
+  <path d="M34 60 Q50 64 66 60" stroke="#101828" stroke-width="0.7" fill="none" opacity="0.45"/>
+  <path d="M40 74 Q50 78 60 74" stroke="#101828" stroke-width="0.6" fill="none" opacity="0.4"/>
+
+  <!-- Whoosh motion lines beside the top -->
+  <path d="M2 18 Q10 20 14 22"  stroke="#5B7B9C" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+  <path d="M2 26 Q10 26 14 26"  stroke="#5B7B9C" stroke-width="1.1" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M98 18 Q90 20 86 22" stroke="#5B7B9C" stroke-width="1.4" fill="none" opacity="0.7" stroke-linecap="round"/>
+  <path d="M98 26 Q90 26 86 26" stroke="#5B7B9C" stroke-width="1.1" fill="none" opacity="0.55" stroke-linecap="round"/>
+
+  <!-- Small debris chunks at the base -->
+  <circle cx="30" cy="90" r="1.5" fill="#5B7B9C" opacity="0.7"/>
+  <circle cx="70" cy="91" r="1.2" fill="#5B7B9C" opacity="0.6"/>
+  <circle cx="38" cy="93" r="1"   fill="#5B7B9C" opacity="0.5"/>
+  <circle cx="64" cy="94" r="1"   fill="#5B7B9C" opacity="0.5"/>
+</svg>`;
+
 // ---------- MUMMY (Necropolis Rare) — cartoon bandaged mummy ----------
 CUSTOM_SVG.necro_mummy = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
