@@ -6,6 +6,59 @@
 
 const CUSTOM_SVG = {};
 
+// ---------- PTERODACTYL (Dino Uncommon) — cartoon flying reptile ----------
+CUSTOM_SVG.dino_pterodactyl = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ptBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#FFD93D"/>
+      <stop offset="1"   stop-color="#FF8C00"/>
+    </linearGradient>
+    <linearGradient id="ptWing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   stop-color="#FFE066"/>
+      <stop offset="1"   stop-color="#E67E00"/>
+    </linearGradient>
+  </defs>
+  <!-- Left wing (spread up and out) -->
+  <path d="M40 56 Q18 34 4 8 Q10 22 16 30 Q23 42 34 48 Z"
+        fill="url(#ptWing)" stroke="#8B4513" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Left wing claw tip -->
+  <path d="M6 10 L2 4 L10 8 Z" fill="#E5E7EB" stroke="#4B5563" stroke-width="0.6" stroke-linejoin="round"/>
+  <!-- Right wing (spread up and out) -->
+  <path d="M60 56 Q82 34 96 8 Q90 22 84 30 Q77 42 66 48 Z"
+        fill="url(#ptWing)" stroke="#8B4513" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Right wing claw tip -->
+  <path d="M94 10 L98 4 L90 8 Z" fill="#E5E7EB" stroke="#4B5563" stroke-width="0.6" stroke-linejoin="round"/>
+  <!-- Body / torso -->
+  <ellipse cx="50" cy="64" rx="15" ry="19" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1.5"/>
+  <!-- Body spots -->
+  <circle cx="55" cy="60" r="2"   fill="#E67E00" opacity="0.7"/>
+  <circle cx="46" cy="70" r="2"   fill="#E67E00" opacity="0.7"/>
+  <circle cx="52" cy="76" r="1.5" fill="#E67E00" opacity="0.5"/>
+  <!-- Head -->
+  <ellipse cx="50" cy="40" rx="14" ry="12" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1.5"/>
+  <!-- Head crest going back -->
+  <path d="M52 30 Q62 26 65 34 Q58 34 55 36 Z"
+        fill="url(#ptBody)" stroke="#8B4513" stroke-width="1.2"/>
+  <!-- Beak (open, cheerful) -->
+  <path d="M36 40 L20 43 L36 47 Z" fill="#FFA500" stroke="#8B4513" stroke-width="1"/>
+  <path d="M36 40 L36 47 L38 43 Z" fill="#FF6B35"/>
+  <!-- Tongue -->
+  <ellipse cx="28" cy="44" rx="4" ry="1.2" fill="#EC4899"/>
+  <!-- Eye -->
+  <circle cx="47" cy="38" r="4"   fill="white" stroke="#1a1a2e" stroke-width="0.8"/>
+  <circle cx="48" cy="39" r="2.2" fill="#1a1a2e"/>
+  <circle cx="48.7" cy="38" r="0.7" fill="white"/>
+  <!-- Cheek spot -->
+  <circle cx="54" cy="44" r="2" fill="#FF8C00" opacity="0.5"/>
+  <!-- Nostril -->
+  <circle cx="30" cy="42" r="0.8" fill="#8B4513"/>
+  <!-- Feet -->
+  <path d="M43 82 L40 92 L46 92 L46 82 Z" fill="#FFA500" stroke="#8B4513" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M54 82 L54 92 L60 92 L57 82 Z" fill="#FFA500" stroke="#8B4513" stroke-width="0.8" stroke-linejoin="round"/>
+  <!-- Little tail -->
+  <path d="M62 76 Q70 76 74 82 Q68 80 63 80 Z" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1"/>
+</svg>`;
+
 // ---------- JELLY BEAN (Candy Shop Uncommon) — colorful bean shape ----------
 CUSTOM_SVG.candy_jelly_bean = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
