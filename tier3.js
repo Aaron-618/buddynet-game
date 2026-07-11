@@ -310,7 +310,7 @@ const TIER3_PACKS = [
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
         { name: "Renaissance Master", emoji: "👨‍🎨" }, { name: "Modern Artist", emoji: "🖌️" },
-        { name: "Sculptor's Muse", emoji: "💃" }, { name: "Mural Painter", emoji: "🎨" }
+        { name: "Sculptor's Muse", emoji: "🎭" }, { name: "Mural Painter", emoji: "🎨" }
       ]},
       { rarity: "legendary", weight: 0.4, buddies: [
         { name: "The Mona Lisa", emoji: "🖼️" }, { name: "Sculptor God", emoji: "🗿" }
@@ -459,7 +459,7 @@ const TIER3_PACKS = [
     requiresAll: true, tier3: true,
     drops: [
       { rarity: "uncommon", weight: 50, buddies: [
-        { name: "Belt", emoji: "🥋" }, { name: "Bo Staff", emoji: "🥢" },
+        { name: "Belt", emoji: "🥋" }, { name: "Bo Staff", emoji: "🎋" },
         { name: "Headband", emoji: "👲" }, { name: "Kendo Stick", emoji: "🎋" },
         { name: "Sparring Pad", emoji: "🛡️" }, { name: "Punching Bag", emoji: "🥊" }
       ]},

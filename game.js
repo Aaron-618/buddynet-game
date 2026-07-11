@@ -125,7 +125,7 @@ const PACKS = [
         { name: "Earthquake", emoji: "🌐" }
       ]},
       { rarity: "legendary", weight: 0.45, buddies: [
-        { name: "Flame Lizard", emoji: "🦎" }
+        { name: "Flame Lizard", emoji: "🐲" }
       ]},
       { rarity: "chroma", weight: 0.04, buddies: [
         { name: "Blue Flare", emoji: "💙" }
@@ -206,7 +206,7 @@ const PACKS = [
         { name: "Triceratops", emoji: "🦏" },
         { name: "Stegosaurus", emoji: "🦕" },
         { name: "Raptor", emoji: "🦖" },
-        { name: "Pterodactyl", emoji: "🪽" }
+        { name: "Pterodactyl", emoji: "🪶" }
       ]},
       { rarity: "rare", weight: 30, buddies: [
         { name: "Brachiosaurus", emoji: "🦕" },
@@ -275,7 +275,7 @@ const PACKS = [
         { name: "Elf", emoji: "🧝" }
       ]},
       { rarity: "epic", weight: 16.5, buddies: [
-        { name: "Griffin", emoji: "🦁" },
+        { name: "Griffin", emoji: "🦅" },
         { name: "Phoenix", emoji: "🐦‍🔥" }
       ]},
       { rarity: "legendary", weight: 0.46, buddies: [
@@ -296,7 +296,7 @@ const PACKS = [
     drops: [
       { rarity: "uncommon", weight: 58, buddies: [
         { name: "Gummy Bear", emoji: "🍬" },
-        { name: "Jelly Bean", emoji: "🫘" },
+        { name: "Jelly Bean", emoji: "🟢" },
         { name: "Lollipop", emoji: "🍭" },
         { name: "Peppermint", emoji: "🍥" }
       ]},
@@ -472,7 +472,7 @@ const PACKS = [
         { name: "Medusa", emoji: "🐍" }
       ]},
       { rarity: "legendary", weight: 0.5, buddies: [
-        { name: "The Titan", emoji: "🦣" }
+        { name: "The Titan", emoji: "🗻" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
         { name: "Pegasus Knight", emoji: "🦄", effect: "rainbow" }
@@ -522,7 +522,7 @@ const PACKS = [
     drops: [
       { rarity: "uncommon", weight: 50, buddies: [
         { name: "Snowball", emoji: "⚪" },
-        { name: "Ice Shard", emoji: "🧊" },
+        { name: "Ice Shard", emoji: "🔷" },
         { name: "Frost Fairy", emoji: "🧚‍♀️" },
         { name: "Polar Pup", emoji: "🐻‍❄️" }
       ]},
@@ -536,7 +536,7 @@ const PACKS = [
         { name: "Snow Leopard", emoji: "🐆" }
       ]},
       { rarity: "legendary", weight: 0.5, buddies: [
-        { name: "The Yeti", emoji: "🦍" }
+        { name: "The Yeti", emoji: "🐻‍❄️" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
         { name: "Aurora Wisp", emoji: "🌌", effect: "rainbow" }
@@ -554,13 +554,13 @@ const PACKS = [
     drops: [
       { rarity: "uncommon", weight: 50, buddies: [
         { name: "Ember", emoji: "🔥" },
-        { name: "Magma Drop", emoji: "🟠" },
+        { name: "Magma Drop", emoji: "💧" },
         { name: "Cinder", emoji: "✨" },
         { name: "Spark Imp", emoji: "💢" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
         { name: "Fire Spirit", emoji: "🔥" },
-        { name: "Lava Slug", emoji: "🐌" },
+        { name: "Lava Slug", emoji: "🐛" },
         { name: "Phoenix Egg", emoji: "🥚" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
@@ -568,7 +568,7 @@ const PACKS = [
         { name: "Volcano Lord", emoji: "🌋" }
       ]},
       { rarity: "legendary", weight: 0.5, buddies: [
-        { name: "The Fire God", emoji: "☄️" }
+        { name: "The Fire God", emoji: "🌋" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
         { name: "Solar Flare", emoji: "☀️", effect: "rainbow" }
@@ -588,7 +588,7 @@ const PACKS = [
         { name: "Ruby Chip", emoji: "♦️" },
         { name: "Sapphire Chip", emoji: "🔷" },
         { name: "Emerald Chip", emoji: "💚" },
-        { name: "Topaz", emoji: "🟡" }
+        { name: "Topaz", emoji: "🟨" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
         { name: "Amethyst", emoji: "💜" },
@@ -600,7 +600,7 @@ const PACKS = [
         { name: "Gem Beast", emoji: "💎" }
       ]},
       { rarity: "legendary", weight: 0.5, buddies: [
-        { name: "The Diamond Lord", emoji: "💎" }
+        { name: "The Diamond Lord", emoji: "🤴" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
         { name: "Prism Geode", emoji: "💠", effect: "rainbow" }
@@ -617,9 +617,9 @@ const PACKS = [
     requiresAll: true,
     drops: [
       { rarity: "uncommon", weight: 50, buddies: [
-        { name: "Drizzle", emoji: "☁️" },
+        { name: "Drizzle", emoji: "🌧️" },
         { name: "Mist", emoji: "🌫️" },
-        { name: "Hail Stone", emoji: "🧊" },
+        { name: "Hail Stone", emoji: "⚪" },
         { name: "Wind Spirit", emoji: "🌬️" }
       ]},
       { rarity: "rare", weight: 33, buddies: [
@@ -650,7 +650,7 @@ const PACKS = [
     drops: [
       { rarity: "uncommon", weight: 50, buddies: [
         { name: "Wyrmling", emoji: "🐍" },
-        { name: "Drake", emoji: "🦎" },
+        { name: "Drake", emoji: "🐊" },
         { name: "Hatchling", emoji: "🥚" },
         { name: "Wyvern", emoji: "🐲" }
       ]},
@@ -664,7 +664,7 @@ const PACKS = [
         { name: "Dragon Knight", emoji: "🛡️" }
       ]},
       { rarity: "legendary", weight: 0.5, buddies: [
-        { name: "The Dragon King", emoji: "🐲" }
+        { name: "The Dragon King", emoji: "🐉" }
       ]},
       { rarity: "chroma", weight: 0.1, buddies: [
         { name: "Rainbow Dragon", emoji: "🐉", effect: "rainbow" }
@@ -688,7 +688,7 @@ const PACKS = [
       ]},
       { rarity: "rare", weight: 33, buddies: [
         { name: "Zombie", emoji: "🧟" },
-        { name: "Mummy", emoji: "🥷" },
+        { name: "Mummy", emoji: "🧟" },
         { name: "Skeleton Warrior", emoji: "⚔️" }
       ]},
       { rarity: "epic", weight: 16.3, buddies: [
@@ -717,12 +717,12 @@ PACKS.push({
     { rarity: "epic", weight: 60, buddies: [
       { name: "Diamond Pup", emoji: "🐶" },
       { name: "Diamond Kitten", emoji: "🐱" },
-      { name: "Diamond Knight", emoji: "🛡️" },
+      { name: "Diamond Knight", emoji: "🤺" },
       { name: "Diamond Eagle", emoji: "🦅" }
     ]},
     { rarity: "legendary", weight: 30, buddies: [
       { name: "Diamond Dragon", emoji: "🐉" },
-      { name: "Diamond Lord", emoji: "👑" }
+      { name: "Diamond Lord", emoji: "🎩" }
     ]},
     { rarity: "chroma", weight: 8, buddies: [
       { name: "Rainbow Diamond", emoji: "💎", effect: "rainbow" }
