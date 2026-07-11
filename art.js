@@ -6,6 +6,27 @@
 
 const CUSTOM_SVG = {};
 
+// ---------- JELLY BEAN (Candy Shop Uncommon) — colorful bean shape ----------
+CUSTOM_SVG.candy_jelly_bean = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="jbGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"    stop-color="#FF5470"/>
+      <stop offset="0.28" stop-color="#FF8C00"/>
+      <stop offset="0.5"  stop-color="#FFD93D"/>
+      <stop offset="0.75" stop-color="#4ADE80"/>
+      <stop offset="1"    stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+  <!-- Jelly bean shape (elongated tilted oval) -->
+  <ellipse cx="50" cy="50" rx="40" ry="26" fill="url(#jbGrad)" transform="rotate(-18 50 50)"
+           stroke="#1a1a2e" stroke-width="1.5"/>
+  <!-- Glossy highlight -->
+  <ellipse cx="38" cy="36" rx="20" ry="7" fill="white" opacity="0.55" transform="rotate(-18 38 36)"/>
+  <!-- Small sparkle -->
+  <circle cx="62" cy="42" r="2" fill="white"/>
+  <circle cx="30" cy="60" r="1.5" fill="white" opacity="0.7"/>
+</svg>`;
+
 // ---------- RAINBOW CHARMANDER (Elemental Mystical) — custom Blooket-style art ----------
 CUSTOM_SVG.elemental_rainbow_charmander = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
