@@ -702,6 +702,20 @@ body {
   filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
   pointer-events: none;
 }
+
+/* Lower-rarity buddies show a plain colored disc instead of an emoji */
+.b-frame .b-disc {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: inset 0 -6px 12px rgba(0,0,0,0.25),
+              inset 0 4px 8px rgba(255,255,255,0.35);
+}
+.b-frame .b-disc.b-disc-common   { background: radial-gradient(circle at 30% 25%, #e5e7eb, #6b7280 75%); }
+.b-frame .b-disc.b-disc-uncommon { background: radial-gradient(circle at 30% 25%, #bbf7d0, #16a34a 75%); }
+.b-frame .b-disc.b-disc-rare     { background: radial-gradient(circle at 30% 25%, #bae6fd, #0284c7 75%); }
+.b-frame .b-disc.b-disc-epic     { background: radial-gradient(circle at 30% 25%, #e9d5ff, #7e22ce 75%); }
 .b-fallback {
   font-size: 44px;
   filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));

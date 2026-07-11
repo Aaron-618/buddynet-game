@@ -860,6 +860,11 @@ function buddyImg(emoji, cls = "", rarity = "", buddyId = "") {
   if (buddyId && typeof CUSTOM_SVG !== "undefined" && CUSTOM_SVG[buddyId]) {
     return `<div class="b-img b-custom ${cls}">${CUSTOM_SVG[buddyId]}</div>`;
   }
+  // Lower rarities: plain colored disc (looks cleaner than the emoji stand-ins)
+  if (rarity === "common" || rarity === "uncommon" || rarity === "rare" || rarity === "epic") {
+    return `<div class="b-img b-disc b-disc-${rarity} ${cls}"></div>`;
+  }
+  // Legendary / Chroma / Mystical / Secret: keep the emoji art
   const style = RARITY_EMOJI_STYLE[rarity] || "microsoft";
   const url = `https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=${style}`;
   const safe = emoji.replace(/'/g, "");
