@@ -59,6 +59,45 @@ CUSTOM_SVG.dino_pterodactyl = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.o
   <path d="M62 76 Q70 76 74 82 Q68 80 63 80 Z" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1"/>
 </svg>`;
 
+// ---------- HAIL STONE (Elemental Uncommon) — icy translucent ball ----------
+CUSTOM_SVG.elemental_hail_stone = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="hsBody" cx="0.4" cy="0.35" r="0.7">
+      <stop offset="0"    stop-color="#FFFFFF"/>
+      <stop offset="0.5"  stop-color="#E8F0F8"/>
+      <stop offset="1"    stop-color="#A8B8C8"/>
+    </radialGradient>
+    <radialGradient id="hsShine" cx="0.3" cy="0.25" r="0.35">
+      <stop offset="0"    stop-color="white" stop-opacity="0.95"/>
+      <stop offset="1"    stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Cast shadow on ground -->
+  <ellipse cx="50" cy="90" rx="26" ry="4" fill="#1a1a2e" opacity="0.35"/>
+
+  <!-- Main hailstone body - slightly irregular rounded shape -->
+  <path d="M20 50 Q18 32 34 24 Q50 18 66 26 Q82 34 82 52 Q82 70 66 78 Q50 84 34 78 Q18 70 20 50 Z"
+        fill="url(#hsBody)" stroke="#8090A0" stroke-width="1.2"/>
+
+  <!-- Subtle surface bumps/facets (rough ice texture) -->
+  <path d="M30 40 Q34 42 38 40" stroke="#8090A0" stroke-width="0.6" fill="none" opacity="0.5"/>
+  <path d="M55 32 Q60 34 65 32" stroke="#8090A0" stroke-width="0.6" fill="none" opacity="0.5"/>
+  <path d="M65 55 Q70 58 72 63" stroke="#8090A0" stroke-width="0.6" fill="none" opacity="0.5"/>
+  <path d="M28 60 Q32 65 30 70" stroke="#8090A0" stroke-width="0.6" fill="none" opacity="0.5"/>
+  <path d="M45 70 Q50 72 55 70" stroke="#8090A0" stroke-width="0.6" fill="none" opacity="0.4"/>
+
+  <!-- Cool blue undertone on bottom -->
+  <ellipse cx="50" cy="72" rx="26" ry="10" fill="#5090C0" opacity="0.15"/>
+
+  <!-- Bright glossy highlight (top-left) -->
+  <ellipse cx="36" cy="34" rx="14" ry="10" fill="url(#hsShine)"/>
+  <!-- Small pinpoint highlight -->
+  <circle cx="30" cy="30" r="3" fill="white" opacity="0.9"/>
+  <!-- Tiny sparkle further along -->
+  <circle cx="58" cy="42" r="1.5" fill="white" opacity="0.8"/>
+  <circle cx="70" cy="58" r="1" fill="white" opacity="0.6"/>
+</svg>`;
+
 // ---------- GRIFFIN (Medieval Epic) — cartoon eagle-lion, cheerful pose ----------
 CUSTOM_SVG.medieval_griffin = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
