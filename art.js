@@ -59,6 +59,52 @@ CUSTOM_SVG.dino_pterodactyl = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.o
   <path d="M62 76 Q70 76 74 82 Q68 80 63 80 Z" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1"/>
 </svg>`;
 
+// ---------- GUMMY BEAR (Candy Shop Uncommon) — translucent blue gummy candy ----------
+CUSTOM_SVG.candy_gummy_bear = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gbBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#7FE8FF"/>
+      <stop offset="0.5" stop-color="#38BDF8"/>
+      <stop offset="1"   stop-color="#0284C7"/>
+    </linearGradient>
+    <radialGradient id="gbHi" cx="0.35" cy="0.3" r="0.5">
+      <stop offset="0"   stop-color="white"    stop-opacity="0.8"/>
+      <stop offset="1"   stop-color="white"    stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Cast shadow -->
+  <ellipse cx="50" cy="94" rx="26" ry="4" fill="#1a1a2e" opacity="0.25"/>
+  <!-- Left ear -->
+  <circle cx="27" cy="20" r="10" fill="url(#gbBody)" stroke="#0369A1" stroke-width="1.2"/>
+  <!-- Right ear -->
+  <circle cx="73" cy="20" r="10" fill="url(#gbBody)" stroke="#0369A1" stroke-width="1.2"/>
+  <!-- Head -->
+  <ellipse cx="50" cy="30" rx="22" ry="20" fill="url(#gbBody)" stroke="#0369A1" stroke-width="1.4"/>
+  <!-- Body (chunky) -->
+  <path d="M18 62 Q18 40 32 38 L68 38 Q82 40 82 62 Q82 88 60 90 L40 90 Q18 88 18 62 Z"
+        fill="url(#gbBody)" stroke="#0369A1" stroke-width="1.4"/>
+  <!-- Arms tucked in front (rounded stumps) -->
+  <ellipse cx="30" cy="60" rx="9" ry="14" fill="url(#gbBody)" stroke="#0369A1" stroke-width="1.2"/>
+  <ellipse cx="70" cy="60" rx="9" ry="14" fill="url(#gbBody)" stroke="#0369A1" stroke-width="1.2"/>
+  <!-- Belly hint (softer paler oval) -->
+  <ellipse cx="50" cy="70" rx="14" ry="16" fill="white" opacity="0.18"/>
+  <!-- Feet at bottom -->
+  <ellipse cx="35" cy="88" rx="9" ry="6" fill="url(#gbBody)" stroke="#0369A1" stroke-width="1.2"/>
+  <ellipse cx="65" cy="88" rx="9" ry="6" fill="url(#gbBody)" stroke="#0369A1" stroke-width="1.2"/>
+  <!-- Small subtle eyes (indents) -->
+  <ellipse cx="41" cy="30" rx="1.8" ry="2.4" fill="#0C4A6E"/>
+  <ellipse cx="59" cy="30" rx="1.8" ry="2.4" fill="#0C4A6E"/>
+  <!-- Tiny snout dot -->
+  <circle cx="50" cy="37" r="1.2" fill="#0C4A6E" opacity="0.5"/>
+  <!-- Glossy top-left highlight over everything (translucency shine) -->
+  <ellipse cx="35" cy="26" rx="18" ry="12" fill="url(#gbHi)"/>
+  <!-- Small round shine on ear -->
+  <circle cx="24" cy="17" r="3" fill="white" opacity="0.55"/>
+  <!-- Small sparkle -->
+  <circle cx="70" cy="46" r="2" fill="white" opacity="0.6"/>
+  <circle cx="46" cy="64" r="1.5" fill="white" opacity="0.5"/>
+</svg>`;
+
 // ---------- JELLY BEAN (Candy Shop Uncommon) — colorful bean shape ----------
 CUSTOM_SVG.candy_jelly_bean = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
