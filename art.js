@@ -59,6 +59,98 @@ CUSTOM_SVG.dino_pterodactyl = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.o
   <path d="M62 76 Q70 76 74 82 Q68 80 63 80 Z" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1"/>
 </svg>`;
 
+// ---------- GRIFFIN (Medieval Epic) — cartoon eagle-lion, cheerful pose ----------
+CUSTOM_SVG.medieval_griffin = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grFur"  x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#F4C87A"/>
+      <stop offset="1"   stop-color="#B87333"/>
+    </linearGradient>
+    <linearGradient id="grFeath" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#FFEEB0"/>
+      <stop offset="1"   stop-color="#D4A144"/>
+    </linearGradient>
+    <linearGradient id="grWing" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#B87333"/>
+      <stop offset="1"   stop-color="#7A4A1A"/>
+    </linearGradient>
+  </defs>
+  <!-- Cast shadow -->
+  <ellipse cx="50" cy="94" rx="30" ry="4" fill="#1a1a2e" opacity="0.25"/>
+
+  <!-- Back wing (raised up-right) -->
+  <path d="M55 34 Q78 12 92 18 Q90 34 82 44 Q72 42 60 42 Z"
+        fill="url(#grWing)" stroke="#3B2100" stroke-width="1.4" stroke-linejoin="round"/>
+  <!-- Back-wing feather lines -->
+  <path d="M62 22 L64 34 M70 18 L70 33 M78 18 L76 33 M85 22 L82 35"
+        stroke="#3B2100" stroke-width="0.5" fill="none"/>
+
+  <!-- Front wing (raised up-left) -->
+  <path d="M42 34 Q22 8 8 18 Q10 34 20 44 Q30 42 40 42 Z"
+        fill="url(#grWing)" stroke="#3B2100" stroke-width="1.4" stroke-linejoin="round"/>
+  <!-- Front-wing feather lines -->
+  <path d="M14 22 L18 34 M22 18 L24 33 M30 18 L28 33 M38 22 L36 35"
+        stroke="#3B2100" stroke-width="0.5" fill="none"/>
+
+  <!-- Lion body (back haunches) -->
+  <ellipse cx="62" cy="66" rx="24" ry="17" fill="url(#grFur)" stroke="#5C3200" stroke-width="1.5"/>
+  <!-- Back leg -->
+  <ellipse cx="72" cy="82" rx="8" ry="9" fill="url(#grFur)" stroke="#5C3200" stroke-width="1.2"/>
+  <ellipse cx="72" cy="90" rx="8" ry="3" fill="url(#grFur)" stroke="#5C3200" stroke-width="1"/>
+  <!-- Toes on back paw -->
+  <path d="M67 90 L67 93 M72 90 L72 93 M77 90 L77 93" stroke="#5C3200" stroke-width="0.6"/>
+
+  <!-- Feathered chest / front body -->
+  <path d="M25 46 Q26 40 35 40 L48 40 L48 78 Q48 84 42 84 Q28 84 24 78 Z"
+        fill="url(#grFeath)" stroke="#5C3200" stroke-width="1.4" stroke-linejoin="round"/>
+  <!-- Feather ruffles on chest -->
+  <path d="M28 52 Q34 55 40 52 M28 60 Q34 63 40 60 M28 68 Q34 71 40 68"
+        stroke="#5C3200" stroke-width="0.6" fill="none"/>
+
+  <!-- Front legs (bird/talon) -->
+  <rect x="30" y="80" width="5" height="10" rx="2" fill="url(#grFeath)" stroke="#5C3200" stroke-width="0.8"/>
+  <rect x="40" y="80" width="5" height="10" rx="2" fill="url(#grFeath)" stroke="#5C3200" stroke-width="0.8"/>
+  <!-- Talons -->
+  <polygon points="28,90 31,88 31,93" fill="#B87333" stroke="#3B2100" stroke-width="0.5"/>
+  <polygon points="34,90 33,93 36,90" fill="#B87333" stroke="#3B2100" stroke-width="0.5"/>
+  <polygon points="38,90 41,88 41,93" fill="#B87333" stroke="#3B2100" stroke-width="0.5"/>
+  <polygon points="44,90 43,93 46,90" fill="#B87333" stroke="#3B2100" stroke-width="0.5"/>
+
+  <!-- Head (eagle head) -->
+  <path d="M22 30 Q22 12 40 12 Q52 12 52 30 Q52 42 40 46 Q28 44 22 38 Z"
+        fill="url(#grFeath)" stroke="#5C3200" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- Head feather crest -->
+  <path d="M30 14 Q30 6 36 10 L36 14 Z" fill="url(#grFeath)" stroke="#5C3200" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M36 12 Q40 3 44 10 L44 14 Z" fill="url(#grFeath)" stroke="#5C3200" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M44 12 Q50 6 52 14 Z" fill="url(#grFeath)" stroke="#5C3200" stroke-width="1" stroke-linejoin="round"/>
+  <!-- Ear-tuft on the side -->
+  <path d="M52 22 Q60 18 56 32 Z" fill="url(#grFeath)" stroke="#5C3200" stroke-width="1"/>
+
+  <!-- Beak -->
+  <path d="M22 32 L8 30 Q10 36 15 38 L22 38 Z" fill="#E8A02D" stroke="#5C3200" stroke-width="1.3" stroke-linejoin="round"/>
+  <!-- Beak hook -->
+  <path d="M8 30 Q11 33 13 32" stroke="#5C3200" stroke-width="1" fill="none" stroke-linecap="round"/>
+  <!-- Mouth open showing pink -->
+  <path d="M14 36 Q19 40 22 38 Q19 41 15 40 Z" fill="#FF9B9B" stroke="#5C3200" stroke-width="0.8"/>
+
+  <!-- Eye -->
+  <circle cx="35" cy="26" r="4"   fill="white" stroke="#1a1a2e" stroke-width="0.9"/>
+  <circle cx="36" cy="27" r="2.4" fill="#1a1a2e"/>
+  <circle cx="36.8" cy="26" r="0.8" fill="white"/>
+  <!-- Eyebrow curve -->
+  <path d="M31 22 Q34 20 39 22" stroke="#5C3200" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+
+  <!-- Long tail -->
+  <path d="M84 66 Q94 62 92 78 Q92 84 88 84"
+        stroke="#B87333" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M84 66 Q94 62 92 78 Q92 84 88 84"
+        stroke="#5C3200" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <!-- Tail tuft (leaf shape) -->
+  <path d="M84 82 Q90 76 92 86 Q88 90 84 82 Z"
+        fill="url(#grFeath)" stroke="#5C3200" stroke-width="1" stroke-linejoin="round"/>
+</svg>`;
+
 // ---------- GUMMY BEAR (Candy Shop Uncommon) — translucent blue gummy candy ----------
 CUSTOM_SVG.candy_gummy_bear = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
