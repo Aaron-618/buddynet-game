@@ -59,6 +59,51 @@ CUSTOM_SVG.dino_pterodactyl = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.o
   <path d="M62 76 Q70 76 74 82 Q68 80 63 80 Z" fill="url(#ptBody)" stroke="#8B4513" stroke-width="1"/>
 </svg>`;
 
+// ---------- MAGMA DROP (Elemental Uncommon) — molten teardrop ----------
+CUSTOM_SVG.elemental_magma_drop = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="mdBody" cx="0.45" cy="0.7" r="0.7">
+      <stop offset="0"    stop-color="#FFF176"/>
+      <stop offset="0.3"  stop-color="#FF9500"/>
+      <stop offset="0.75" stop-color="#DC2626"/>
+      <stop offset="1"    stop-color="#7A0000"/>
+    </radialGradient>
+    <radialGradient id="mdShine" cx="0.35" cy="0.6" r="0.35">
+      <stop offset="0"    stop-color="white" stop-opacity="0.9"/>
+      <stop offset="1"    stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mdGlow" cx="0.5" cy="0.5" r="0.55">
+      <stop offset="0"    stop-color="#FF9500" stop-opacity="0.5"/>
+      <stop offset="1"    stop-color="#FF9500" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Molten glow behind (heat halo) -->
+  <ellipse cx="50" cy="58" rx="42" ry="42" fill="url(#mdGlow)"/>
+  <!-- Cast shadow (dark red glow on ground) -->
+  <ellipse cx="50" cy="93" rx="20" ry="3.5" fill="#7A0000" opacity="0.6"/>
+
+  <!-- Main teardrop shape (pointy top, round bottom) -->
+  <path d="M50 8
+           Q40 30 32 46
+           Q22 62 30 78
+           Q38 92 50 92
+           Q62 92 70 78
+           Q78 62 68 46
+           Q60 30 50 8 Z"
+        fill="url(#mdBody)" stroke="#5A0000" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- Bright inner glow ellipse (hot core) -->
+  <ellipse cx="50" cy="66" rx="12" ry="14" fill="#FFF176" opacity="0.4"/>
+
+  <!-- Glossy highlight -->
+  <ellipse cx="38" cy="58" rx="8" ry="14" fill="url(#mdShine)" transform="rotate(-15 38 58)"/>
+  <!-- Small bright shine -->
+  <circle cx="35" cy="52" r="3" fill="white" opacity="0.85"/>
+  <!-- Tiny sparkles / embers -->
+  <circle cx="62" cy="48" r="1.5" fill="#FFF176" opacity="0.9"/>
+  <circle cx="55" cy="80" r="1"   fill="#FFF176" opacity="0.7"/>
+</svg>`;
+
 // ---------- HAIL STONE (Elemental Uncommon) — icy translucent ball ----------
 CUSTOM_SVG.elemental_hail_stone = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
