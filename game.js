@@ -819,6 +819,8 @@ const State = {
   lastSpin: _num("bn_lastSpin", 0),
   endgameUnlocked: localStorage.getItem("bn_endgame") === "true",
   ultraUnlocked: localStorage.getItem("bn_ultra") === "true",
+  xp: _num("bn_xp", 0),
+  level: _num("bn_level", 1),
   playTimeSec: _num("bn_playtime", 0),
   achievements: _achievements(),
   filterRarity: "all",
@@ -835,6 +837,8 @@ function save() {
   localStorage.setItem("bn_endgame", State.endgameUnlocked ? "true" : "false");
   localStorage.setItem("bn_ultra", State.ultraUnlocked ? "true" : "false");
   localStorage.setItem("bn_playtime", State.playTimeSec);
+  localStorage.setItem("bn_xp", State.xp);
+  localStorage.setItem("bn_level", State.level);
   localStorage.setItem("bn_achievements", JSON.stringify(State.achievements));
 }
 
@@ -975,6 +979,7 @@ function checkSecretUnlocks() {
     if (progressFor(s.unlock) >= targetFor(s.unlock)) {
       State.owned[s.id] = 1;
       State.gems += 3;
+      awardXP("secret");
       newlyUnlocked.push(s);
     }
   });
@@ -1027,6 +1032,7 @@ function placeHiddenSpots() {
       if (ownedCount(h.id) > 0) return;
       State.owned[h.id] = 1;
       State.gems += 3;
+      awardXP("secret");
       save();
       spot.remove();
       celebrateHiddenFind(h);
@@ -1120,10 +1126,49 @@ function celebrateUltraUnlock() {
   };
 }
 
+// ---------- XP / LEVEL ----------
+const XP_PER_RARITY = {
+  common: 0, uncommon: 5, rare: 10, epic: 15,
+  legendary: 20, chroma: 30, mystical: 50, secret: 100
+};
+function xpToNextLevel(level) { return level * 100; }
+function updateXPBar() {
+  const need = xpToNextLevel(State.level);
+  const cur = Math.max(0, State.xp);
+  const lvlEl = document.getElementById("xpLevel");
+  const fillEl = document.getElementById("xpFill");
+  const curEl = document.getElementById("xpCur");
+  const maxEl = document.getElementById("xpMax");
+  if (!lvlEl) return;
+  lvlEl.textContent = State.level;
+  curEl.textContent = cur;
+  maxEl.textContent = need;
+  fillEl.style.width = Math.min(100, (cur / need) * 100) + "%";
+}
+function celebrateLevelUp(level) {
+  bigPop("LEVEL " + level + "!", "#a855f7");
+  const reward = 50 + level * 25;
+  State.coins += reward;
+  floatText("+" + reward + " 🪙 level reward", "#ffd93d");
+}
+function awardXP(rarity) {
+  const gain = XP_PER_RARITY[rarity] || 0;
+  if (!gain) return;
+  State.xp += gain;
+  floatText("+" + gain + " XP", "#a855f7");
+  while (State.xp >= xpToNextLevel(State.level)) {
+    State.xp -= xpToNextLevel(State.level);
+    State.level++;
+    celebrateLevelUp(State.level);
+  }
+  updateXPBar();
+}
+
 // ---------- HUD ----------
 function updateWallet() {
   $("walletCoins").textContent = State.coins.toLocaleString();
   $("walletGems").textContent = State.gems.toLocaleString();
+  updateXPBar();
 
   const baseTotal = baseBuddies().length;
   const baseOwned = baseCollectedCount();
@@ -1277,6 +1322,7 @@ function bulkOpenPack(pack, qty) {
     const buddy = pickFromPack(pack);
     const wasNew = !discovered(buddy.id);
     State.owned[buddy.id] = (State.owned[buddy.id] || 0) + 1;
+    State.xp += XP_PER_RARITY[buddy.rarity] || 0;
     if (buddy.rarity === "mystical") {
       State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
       State.gems += 1;
@@ -1289,6 +1335,13 @@ function bulkOpenPack(pack, qty) {
 
   const wasEnd = State.endgameUnlocked;
   const wasUltra = State.ultraUnlocked;
+  // Process any level-ups from accumulated bulk XP
+  while (State.xp >= xpToNextLevel(State.level)) {
+    State.xp -= xpToNextLevel(State.level);
+    State.level++;
+    celebrateLevelUp(State.level);
+  }
+  updateXPBar();
   checkEndgameUnlock();
   checkUltraUnlock();
   save();
@@ -1368,6 +1421,7 @@ function openPack(pack) {
   const buddy = pickFromPack(pack);
   const isNew = !discovered(buddy.id);
   State.owned[buddy.id] = (State.owned[buddy.id] || 0) + 1;
+  awardXP(buddy.rarity);
   if (buddy.rarity === "mystical") {
     State.achievements.mysticals_pulled = (State.achievements.mysticals_pulled || 0) + 1;
     State.gems += 1;
