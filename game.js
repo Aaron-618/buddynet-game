@@ -1242,7 +1242,9 @@ function renderShop() {
   }
 
   // Pack visibility cascades by tier — but diamond/gem packs are always shown
-  const alwaysPacks = PACKS.filter(p => p.alwaysShow);
+  // Diamond Pack (alwaysShow) hides until the player has earned at least one gem or pulled a mystical.
+  const hasGemProgress = State.gems > 0 || (State.achievements && State.achievements.mysticals_pulled > 0);
+  const alwaysPacks = PACKS.filter(p => p.alwaysShow && hasGemProgress);
   let tierPacks;
   if (ultra) tierPacks = PACKS.filter(p => p.tier3);
   else if (endgameOn) tierPacks = PACKS.filter(p => p.requiresAll && !p.tier3);
