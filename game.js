@@ -821,7 +821,6 @@ const State = {
   ultraUnlocked: localStorage.getItem("bn_ultra") === "true",
   xp: _num("bn_xp", 0),
   level: _num("bn_level", 1),
-  playTimeSec: _num("bn_playtime", 0),
   achievements: _achievements(),
   filterRarity: "all",
   filterPack: "all"
@@ -836,7 +835,6 @@ function save() {
   localStorage.setItem("bn_lastSpin", State.lastSpin);
   localStorage.setItem("bn_endgame", State.endgameUnlocked ? "true" : "false");
   localStorage.setItem("bn_ultra", State.ultraUnlocked ? "true" : "false");
-  localStorage.setItem("bn_playtime", State.playTimeSec);
   localStorage.setItem("bn_xp", State.xp);
   localStorage.setItem("bn_level", State.level);
   localStorage.setItem("bn_achievements", JSON.stringify(State.achievements));
@@ -2755,41 +2753,6 @@ save();
 // Place invisible hidden-buddy click targets after the initial render
 setTimeout(() => { try { placeHiddenSpots(); } catch(e){} }, 50);
 applyRevealMode();
-
-// ---------- 15-MINUTE PLAY REWARD ----------
-const PLAY_REWARD_INTERVAL = 15 * 60; // seconds
-const PLAY_REWARD_AMOUNT   = 10000; // 10,000 coins
-
-function showPlayRewardFlash(amount) {
-  const flash = document.createElement("div");
-  flash.className = "play-reward-flash";
-  flash.innerHTML = `
-    <div class="prf-icon">🎁</div>
-    <div class="prf-text">
-      <div class="prf-amount">+${amount.toLocaleString()} 🪙</div>
-      <div class="prf-sub">15-minute play reward!</div>
-    </div>
-  `;
-  document.body.appendChild(flash);
-  setTimeout(() => flash.classList.add("prf-out"), 1100);
-  setTimeout(() => flash.remove(), 1300);
-}
-
-setInterval(() => {
-  if (document.visibilityState !== "visible") return;
-  State.playTimeSec = (State.playTimeSec || 0) + 1;
-  if (State.playTimeSec > 0 && State.playTimeSec % PLAY_REWARD_INTERVAL === 0) {
-    State.coins += PLAY_REWARD_AMOUNT;
-    save();
-    updateWallet();
-    renderShop();
-    showPlayRewardFlash(PLAY_REWARD_AMOUNT);
-    maybeUnlockSecrets();
-  } else if (State.playTimeSec % 15 === 0) {
-    // Persist every 15s so progress survives refreshes
-    localStorage.setItem("bn_playtime", State.playTimeSec);
-  }
-}, 1000);
 
 setupNav();
 setupGameNav();
